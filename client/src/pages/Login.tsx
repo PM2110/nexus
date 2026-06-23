@@ -23,7 +23,6 @@ export const Login: React.FC = () => {
   // Page states
   const [isSignup, setIsSignup] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<'candidate' | 'interviewer'>('candidate');
   const [form, setForm] = useState({ name: '', email: '', password: '', remember: false });
 
   // Cursor mockup state
@@ -39,7 +38,7 @@ export const Login: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form Submitted:', { ...form, role, isSignup });
+    console.log('Form Submitted:', { ...form, isSignup });
   };
 
   return (
@@ -68,13 +67,13 @@ export const Login: React.FC = () => {
             <div className="eyebrow-teal">
               {t('login.eyebrow')}
             </div>
-            <h1 className="font-serif text-4xl lg:text-[40px] leading-[1.18] tracking-tight mb-4 font-normal">
+            <h1 className="auth-showcase-title">
               {t('login.stage_title_main')}<br />
               <span className="italic text-[#1ec8b5]">
                 {t('login.stage_title_sub')}
               </span>
             </h1>
-            <p className="section-subtitle">
+            <p className="auth-showcase-desc">
               {t('login.stage_desc')}
             </p>
           </div>
@@ -138,22 +137,6 @@ export const Login: React.FC = () => {
                 <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80]" />
                 {t('login.editor_collaborators')}
               </div>
-            </div>
-          </div>
-
-          {/* Stats band */}
-          <div className="flex gap-8 rise-in">
-            <div>
-              <div className="font-serif text-xl text-[#e7e9ec]">4</div>
-              <div className="font-mono text-[11px] text-[#5e6a7a] tracking-wide mt-0.5">{t('login.stat_sheets')}</div>
-            </div>
-            <div>
-              <div className="font-serif text-xl text-[#e7e9ec]">&lt;100ms</div>
-              <div className="font-mono text-[11px] text-[#5e6a7a] tracking-wide mt-0.5">{t('login.stat_latency')}</div>
-            </div>
-            <div>
-              <div className="font-serif text-xl text-[#e7e9ec]">6</div>
-              <div className="font-mono text-[11px] text-[#5e6a7a] tracking-wide mt-0.5">{t('login.stat_languages')}</div>
             </div>
           </div>
         </div>
@@ -314,29 +297,7 @@ export const Login: React.FC = () => {
                 </div>
               </div>
 
-              {/* Role Chip Selector (Signup Mode only) */}
-              {isSignup && (
-                <div className="auth-role-row">
-                  <button
-                    type="button"
-                    onClick={() => setRole('candidate')}
-                    className={`auth-role-btn ${
-                      role === 'candidate' ? 'auth-role-btn-cand-active' : 'auth-role-btn-inactive'
-                    }`}
-                  >
-                    {t('login.role_candidate')}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRole('interviewer')}
-                    className={`auth-role-btn ${
-                      role === 'interviewer' ? 'auth-role-btn-int-active' : 'auth-role-btn-inactive'
-                    }`}
-                  >
-                    {t('login.role_interviewer')}
-                  </button>
-                </div>
-              )}
+
 
               {/* Remember and Forgot password link */}
               <div className="auth-remember-row">
