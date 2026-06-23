@@ -1262,7 +1262,6 @@
   border-radius: 5px 5px 5px 0;
   color: var(--void);
   white-space: nowrap;
-  transition: top 1.1s var(--ease), left 1.1s var(--ease);
   pointer-events: none;
   background-color: var(--teal);
   transform: translateY(-22px);
@@ -1277,19 +1276,39 @@
   border-radius: 5px 5px 5px 0;
   color: var(--void);
   white-space: nowrap;
-  transition: top 1.1s var(--ease), left 1.1s var(--ease);
   pointer-events: none;
   background-color: var(--gold);
   transform: translateY(-22px);
 }
 
-.editor-tag-selection {
+.editor-caret-t {
   position: absolute;
-  height: 1.5em;
-  border-radius: 3px;
-  transition: top 1.1s var(--ease), left 1.1s var(--ease), width 1.1s var(--ease);
+  width: 2px;
+  height: 1.25em;
+  background-color: var(--teal);
   pointer-events: none;
-  background: rgba(30, 200, 181, 0.15);
+  animation: blink 1s ease-in-out infinite;
+}
+
+.editor-caret-g {
+  position: absolute;
+  width: 2px;
+  height: 1.25em;
+  background-color: var(--gold);
+  pointer-events: none;
+  animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 40% {
+    opacity: 1;
+  }
+  50%, 90% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .editor-circle-btn {

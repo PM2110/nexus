@@ -3,31 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
 import { Button } from '../components/common/Button';
 
-interface Position {
-  teal: { top: number; left: number };
-  gold: { top: number; left: number };
-  sel: { top: number; left: number; width: number };
-}
-
-const cursorPositions: Position[] = [
-  { teal: { top: 80, left: 90 }, gold: { top: 132, left: 70 }, sel: { top: 80, left: 200, width: 60 } },
-  { teal: { top: 154, left: 230 }, gold: { top: 206, left: 120 }, sel: { top: 154, left: 60, width: 170 } },
-  { teal: { top: 232, left: 150 }, gold: { top: 180, left: 280 }, sel: { top: 232, left: 40, width: 100 } },
-  { teal: { top: 106, left: 260 }, gold: { top: 258, left: 90 }, sel: { top: 106, left: 70, width: 180 } },
-];
-
 export const HomeHero: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [posIdx, setPosIdx] = useState(1);
-  const currentPos = cursorPositions[posIdx % cursorPositions.length];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setPosIdx((prev) => prev + 1);
-    }, 2600);
-    return () => clearInterval(timer);
-  }, []);
 
   return (
     <header className="hero-header">
@@ -37,7 +15,7 @@ export const HomeHero: React.FC = () => {
             <span className="w-1.5 h-1.5 rounded-full bg-[#1ec8b5] shadow-[0_0_0_0_rgba(30,200,181,0.45)] animate-[pulseDot_2.2s_infinite]" />
             {t('hero.eyebrow')}
           </div>
-          
+
           <h1 className="hero-headline">
             {t('hero.headline_main')}<br />
             {t('hero.headline_sub')}{' '}
@@ -45,7 +23,7 @@ export const HomeHero: React.FC = () => {
               {t('hero.headline_em')}
             </span>
           </h1>
-          
+
           <p className="hero-subtitle">
             {t('hero.sub')}
           </p>
@@ -106,28 +84,32 @@ export const HomeHero: React.FC = () => {
               <span className="w-7 text-[#5e6a7a] opacity-60 select-none">9</span>
               <span className="text-[#9aa5b3]">
                 &nbsp; <span className="text-[#5e6a7a] italic">// O(n) one-pass — Manan, 0:42</span>
-                <span className="inline-block w-0.5 h-[1.1em] bg-[#1ec8b5] ml-0.5 align-text-bottom animate-[blink_1s_steps(2)_infinite]" />
               </span>
             </div>
             <div className="flex"><span className="w-7 text-[#5e6a7a] opacity-60 select-none">10</span><span className="text-[#9aa5b3]">&#125;</span></div>
 
-            {/* Simulated cursor tags */}
+            {/* Simulated static blinking cursors */}
+            <div
+              className="editor-caret-t"
+              style={{ top: '241px', left: '260px' }}
+            />
             <div
               className="editor-tag-t"
-              style={{ top: `${currentPos.teal.top}px`, left: `${currentPos.teal.left}px` }}
+              style={{ top: '238px', left: '260px' }}
             >
               Manan
             </div>
+
+            <div
+              className="editor-caret-g"
+              style={{ top: '136px', left: '240px' }}
+            />
             <div
               className="editor-tag-g"
-              style={{ top: `${currentPos.gold.top}px`, left: `${currentPos.gold.left}px` }}
+              style={{ top: '133px', left: '240px' }}
             >
               Alex
             </div>
-            <div
-              className="editor-tag-selection"
-              style={{ top: `${currentPos.sel.top}px`, left: `${currentPos.sel.left}px`, width: `${currentPos.sel.width}px` }}
-            />
           </div>
 
           <div className="editor-footer">

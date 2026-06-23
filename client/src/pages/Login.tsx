@@ -3,38 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
 import { Button } from '../components/common/Button';
 
-interface CursorPosition {
-  t: { top: number; left: number };
-  g: { top: number; left: number };
-  sel: { top: number; left: number; width: number };
-}
-
-const cursorPositions: CursorPosition[] = [
-  { t: { top: 102, left: 230 }, g: { top: 152, left: 90 }, sel: { top: 102, left: 60, width: 90 } },
-  { t: { top: 128, left: 200 }, g: { top: 202, left: 100 }, sel: { top: 128, left: 60, width: 130 } },
-  { t: { top: 178, left: 130 }, g: { top: 228, left: 250 }, sel: { top: 178, left: 40, width: 80 } },
-  { t: { top: 152, left: 270 }, g: { top: 102, left: 80 }, sel: { top: 152, left: 70, width: 150 } },
-];
-
 export const Login: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  
+
   // Page states
   const [isSignup, setIsSignup] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '', remember: false });
-
-  // Cursor mockup state
-  const [cursorIdx, setCursorIdx] = useState(1);
-  const currentPos = cursorPositions[cursorIdx % cursorPositions.length];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCursorIdx((prev) => prev + 1);
-    }, 2800);
-    return () => clearInterval(timer);
-  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +20,7 @@ export const Login: React.FC = () => {
   return (
     <div className="page-wrapper overflow-hidden">
       <div className="auth-page-grid">
-        
+
         {/* LEFT SIDE: PRODUCT SHOWCASE */}
         <div className="auth-left-showcase">
           {/* Ambient background glows */}
@@ -108,28 +84,32 @@ export const Login: React.FC = () => {
                 <span className="w-6 text-[#5e6a7a] opacity-55 select-none">9</span>
                 <span className="text-[#9aa5b3]">
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; result.<span className="text-[#7fb8e0]">append</span>([start, end])
-                  <span className="inline-block w-0.5 h-[1.1em] bg-[#1ec8b5] ml-0.5 animate-[blink_1s_steps(2)_infinite]" />
                 </span>
               </div>
               <div className="flex"><span className="w-6 text-[#5e6a7a] opacity-55 select-none">10</span><span className="text-[#9aa5b3]">&nbsp;&nbsp; <span className="text-[#cba135]">return</span> result</span></div>
 
-              {/* Simulated cursors and select frames */}
+              {/* Simulated static blinking cursors */}
+              <div
+                className="editor-caret-t"
+                style={{ top: '267px', left: '309px' }}
+              />
               <div
                 className="editor-tag-t"
-                style={{ top: `${currentPos.t.top}px`, left: `${currentPos.t.left}px` }}
+                style={{ top: '264px', left: '309px' }}
               >
                 Manan
               </div>
+
+              <div
+                className="editor-caret-g"
+                style={{ top: '136px', left: '240px' }}
+              />
               <div
                 className="editor-tag-g"
-                style={{ top: `${currentPos.g.top}px`, left: `${currentPos.g.left}px` }}
+                style={{ top: '133px', left: '240px' }}
               >
                 Alex
               </div>
-              <div
-                className="editor-tag-selection"
-                style={{ top: `${currentPos.sel.top}px`, left: `${currentPos.sel.left}px`, width: `${currentPos.sel.width}px` }}
-              />
             </div>
 
             <div className="editor-footer">
@@ -144,7 +124,7 @@ export const Login: React.FC = () => {
         {/* RIGHT SIDE: AUTHENTICATION FORM */}
         <div className="auth-right-form">
           <div className="auth-form-box">
-            
+
             {/* Header top row */}
             <div className="auth-header-row">
               <button onClick={() => navigate('/')} className="back-btn">
