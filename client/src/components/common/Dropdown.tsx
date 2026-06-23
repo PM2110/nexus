@@ -41,7 +41,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   return (
     <div className="relative inline-block w-full text-left" ref={dropdownRef}>
       {label && (
-        <label className="block text-xs font-semibold text-neutral-400 mb-2 uppercase tracking-wide">
+        <label className="input-label">
           {label}
         </label>
       )}
@@ -49,7 +49,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex justify-between items-center w-full px-4 py-3 text-sm rounded-lg glass-card text-neutral-200 focus:outline-none focus:ring-1 focus:ring-[#1ec8b5] transition-all duration-200"
+          className="dropdown-trigger glass-card"
           id="menu-button"
           aria-expanded={isOpen}
           aria-haspopup="true"
@@ -80,10 +80,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   onChange(option.value);
                   setIsOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-sm transition-colors duration-150 ${
+                className={`dropdown-item ${
                   option.value === value
-                    ? 'bg-[#1ec8b5]/15 text-[#1ec8b5]'
-                    : 'text-neutral-300 hover:bg-neutral-800'
+                    ? 'dropdown-item-active'
+                    : 'dropdown-item-inactive'
                 }`}
                 role="menuitem"
               >

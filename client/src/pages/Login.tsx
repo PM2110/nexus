@@ -43,17 +43,17 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen text-[#e7e9ec] bg-[#0a0e14] font-sans selection:bg-[#14837a] selection:text-white overflow-hidden">
-      <div className="grid grid-cols-1 md:grid-cols-2 h-screen">
+    <div className="page-wrapper overflow-hidden">
+      <div className="auth-page-grid">
         
         {/* LEFT SIDE: PRODUCT SHOWCASE */}
-        <div className="hidden md:flex flex-col justify-between p-12 bg-[#0d1219] border-r border-[#222b38] relative overflow-hidden">
+        <div className="auth-left-showcase">
           {/* Ambient background glows */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_600px_420px_at_20%_10%,rgba(30,200,181,0.18),transparent_65%),radial-gradient(ellipse_600px_420px_at_90%_95%,rgba(203,161,53,0.16),transparent_65%)] opacity-55 pointer-events-none" />
           <div className="absolute inset-0 bg-[linear-gradient(#1a212c_1px,transparent_1px),linear-gradient(90deg,#1a212c_1px,transparent_1px)] bg-[size:56px_56px] opacity-22 [mask-image:radial-gradient(ellipse_700px_500px_at_30%_30%,black,transparent_75%)] pointer-events-none" />
 
           {/* Brand Logo */}
-          <button onClick={() => navigate('/')} className="relative z-10 flex items-center gap-2.5 font-serif font-semibold text-xl text-left bg-transparent border-none p-0 cursor-pointer">
+          <button onClick={() => navigate('/')} className="nav-logo relative z-10 text-left">
             <svg className="w-6.5 h-6.5" viewBox="0 0 32 32" fill="none">
               <circle cx="16" cy="16" r="3" fill="#1ec8b5" />
               <circle cx="16" cy="16" r="10.5" stroke="#1ec8b5" stroke-width="1.3" opacity="0.8" />
@@ -65,7 +65,7 @@ export const Login: React.FC = () => {
 
           {/* Copy section */}
           <div className="relative z-10 max-w-[430px] rise-in">
-            <div className="font-mono text-[11.5px] uppercase tracking-widest text-[#1ec8b5] mb-4.5">
+            <div className="eyebrow-teal">
               {t('login.eyebrow')}
             </div>
             <h1 className="font-serif text-4xl lg:text-[40px] leading-[1.18] tracking-tight mb-4 font-normal">
@@ -74,21 +74,21 @@ export const Login: React.FC = () => {
                 {t('login.stage_title_sub')}
               </span>
             </h1>
-            <p className="text-[#9aa5b3] text-[15.5px] leading-[1.65]">
+            <p className="section-subtitle">
               {t('login.stage_desc')}
             </p>
           </div>
 
-          {/* Interactive cursor preview */}
-          <div className="relative z-10 bg-[#0a0e14] border border-[#222b38] rounded-xl overflow-hidden shadow-2xl rise-in">
-            <div className="flex justify-between items-center px-4.5 py-2.5 bg-[#131a24] border-b border-[#222b38]">
+          {/* Interactive cursor preview using semantic classes */}
+          <div className="editor-mockup">
+            <div className="editor-header">
               <div className="flex items-center gap-2">
                 <div className="flex gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#222b38]" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#222b38]" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#222b38]" />
+                  <span className="editor-circle-btn" />
+                  <span className="editor-circle-btn" />
+                  <span className="editor-circle-btn" />
                 </div>
-                <span className="font-mono text-[11.5px] text-[#5e6a7a]">{t('login.editor_file')}</span>
+                <span className="font-mono text-[11.5px] text-[#5e6a7a] ml-1.5">{t('login.editor_file')}</span>
               </div>
               <div className="flex">
                 <div className="w-[19px] h-[19px] rounded-full border-2 border-[#131a24] flex items-center justify-center font-mono text-[9px] font-semibold text-[#0a0e14] bg-[#1ec8b5]">M</div>
@@ -96,7 +96,7 @@ export const Login: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-5.5 font-mono text-[12.8px] leading-[1.85] relative min-h-[220px]">
+            <div className="editor-body min-h-[220px]">
               <div className="flex"><span className="w-6 text-[#5e6a7a] opacity-55 select-none">1</span><span className="text-[#5e6a7a] italic"># shared-sheet · live</span></div>
               <div className="flex"><span className="w-6 text-[#5e6a7a] opacity-55 select-none">2</span><span className="text-[#9aa5b3]"><span className="text-[#cba135]">def</span> <span className="text-[#7fb8e0]">merge</span>(intervals):</span></div>
               <div className="flex"><span className="w-6 text-[#5e6a7a] opacity-55 select-none">3</span><span className="text-[#9aa5b3]">&nbsp;&nbsp; intervals.<span className="text-[#7fb8e0]">sort</span>()</span></div>
@@ -116,26 +116,28 @@ export const Login: React.FC = () => {
 
               {/* Simulated cursors and select frames */}
               <div
-                className="absolute font-mono text-[9.5px] font-semibold px-1.5 py-0.5 rounded-tr rounded-br rounded-bl text-[#0a0e14] bg-[#1ec8b5] transition-all duration-[1.1s] ease-[cubic-bezier(.16,.8,.3,1)] pointer-events-none"
+                className="editor-tag-t"
                 style={{ top: `${currentPos.t.top}px`, left: `${currentPos.t.left}px` }}
               >
                 Manan
               </div>
               <div
-                className="absolute font-mono text-[9.5px] font-semibold px-1.5 py-0.5 rounded-tr rounded-br rounded-bl text-[#0a0e14] bg-[#cba135] transition-all duration-[1.1s] ease-[cubic-bezier(.16,.8,.3,1)] pointer-events-none"
+                className="editor-tag-g"
                 style={{ top: `${currentPos.g.top}px`, left: `${currentPos.g.left}px` }}
               >
                 Alex
               </div>
               <div
-                className="absolute h-6 rounded bg-[#1ec8b5]/15 transition-all duration-[1.1s] ease-[cubic-bezier(.16,.8,.3,1)] pointer-events-none"
+                className="editor-tag-selection"
                 style={{ top: `${currentPos.sel.top}px`, left: `${currentPos.sel.left}px`, width: `${currentPos.sel.width}px` }}
               />
             </div>
 
-            <div className="flex items-center gap-1.5 px-4 py-2.2 bg-[#131a24] border-t border-[#222b38] font-mono text-[11px] text-[#5e6a7a]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80]" />
-              {t('login.editor_collaborators')}
+            <div className="editor-footer">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80]" />
+                {t('login.editor_collaborators')}
+              </div>
             </div>
           </div>
 
@@ -157,29 +159,29 @@ export const Login: React.FC = () => {
         </div>
 
         {/* RIGHT SIDE: AUTHENTICATION FORM */}
-        <div className="flex items-center justify-center p-6 md:p-10 relative">
-          <div className="w-full max-w-[380px] rise-in">
+        <div className="auth-right-form">
+          <div className="auth-form-box">
             
             {/* Header top row */}
-            <div className="flex justify-between items-center mb-11">
-              <button onClick={() => navigate('/')} className="text-xs text-[#5e6a7a] flex items-center gap-1.5 hover:text-[#9aa5b3] transition-colors bg-transparent border-none p-0 cursor-pointer">
+            <div className="auth-header-row">
+              <button onClick={() => navigate('/')} className="back-btn">
                 <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none">
                   <path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
                 {t('login.back_home')}
               </button>
-              <div className="flex bg-[#131a24] border border-[#222b38] rounded-lg p-0.5 font-mono text-[11.5px]">
+              <div className="auth-tabs">
                 <button
                   type="button"
                   onClick={() => setIsSignup(false)}
-                  className={`px-3 py-1.5 rounded-md transition-all ${!isSignup ? 'bg-[#1a222e] text-[#e7e9ec]' : 'text-[#5e6a7a]'}`}
+                  className={`auth-tab-btn ${!isSignup ? 'auth-tab-btn-active' : 'auth-tab-btn-inactive'}`}
                 >
                   {t('login.sign_in_tab')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsSignup(true)}
-                  className={`px-3 py-1.5 rounded-md transition-all ${isSignup ? 'bg-[#1a222e] text-[#e7e9ec]' : 'text-[#5e6a7a]'}`}
+                  className={`auth-tab-btn ${isSignup ? 'auth-tab-btn-active' : 'auth-tab-btn-inactive'}`}
                 >
                   {t('login.sign_up_tab')}
                 </button>
@@ -187,11 +189,11 @@ export const Login: React.FC = () => {
             </div>
 
             {/* Title & switch link */}
-            <div className="mb-8">
-              <h2 className="font-serif text-3xl font-medium tracking-tight mb-2">
+            <div className="auth-title-section">
+              <h2 className="auth-title">
                 {isSignup ? t('login.create_workspace') : t('login.welcome_back')}
               </h2>
-              <p className="text-[#9aa5b3] text-sm">
+              <p className="auth-subtitle">
                 {isSignup ? (
                   <>
                     {t('login.already_have')}{' '}
@@ -211,7 +213,7 @@ export const Login: React.FC = () => {
             </div>
 
             {/* OAuth buttons */}
-            <div className="flex gap-2.5 mb-6">
+            <div className="auth-oauth-row">
               <Button variant="outline" className="flex-1 flex gap-2" type="button">
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -229,19 +231,19 @@ export const Login: React.FC = () => {
               </Button>
             </div>
 
-            <div className="flex items-center gap-3 text-xs font-mono text-[#5e6a7a] mb-6 before:content-[''] before:flex-1 before:h-[1px] before:bg-[#222b38] after:content-[''] after:flex-1 after:h-[1px] after:bg-[#222b38]">
+            <div className="auth-divider">
               {t('login.or_email')}
             </div>
 
             <form onSubmit={handleSubmit}>
               {/* Full Name Field (Signup Mode only) */}
               {isSignup && (
-                <div className="mb-4">
-                  <label className="block text-xs font-medium text-[#9aa5b3] mb-2" htmlFor="name">
+                <div className="auth-form-field">
+                  <label className="input-label" htmlFor="name">
                     {t('login.label_name')}
                   </label>
-                  <div className="relative">
-                    <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5e6a7a] pointer-events-none" viewBox="0 0 16 16" fill="none">
+                  <div className="auth-field-relative">
+                    <svg className="auth-field-icon" viewBox="0 0 16 16" fill="none">
                       <circle cx="8" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.4" />
                       <path d="M3 13c0-2.5 2.2-4 5-4s5 1.5 5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
                     </svg>
@@ -251,7 +253,7 @@ export const Login: React.FC = () => {
                       placeholder={t('login.placeholder_name')}
                       value={form.name}
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      className="w-full bg-[#131a24] border border-[#222b38] rounded-lg py-2.5 pl-9.5 pr-3.5 text-sm text-[#e7e9ec] placeholder-[#5e6a7a] focus:outline-none focus:border-[#1ec8b5] focus:bg-[#1a222e] transition-colors"
+                      className="input-field input-field-icon-pad"
                       required
                     />
                   </div>
@@ -259,12 +261,12 @@ export const Login: React.FC = () => {
               )}
 
               {/* Email Field */}
-              <div className="mb-4">
-                <label className="block text-xs font-medium text-[#9aa5b3] mb-2" htmlFor="email">
+              <div className="auth-form-field">
+                <label className="input-label" htmlFor="email">
                   {t('login.label_email')}
                 </label>
-                <div className="relative">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5e6a7a] pointer-events-none" viewBox="0 0 16 16" fill="none">
+                <div className="auth-field-relative">
+                  <svg className="auth-field-icon" viewBox="0 0 16 16" fill="none">
                     <rect x="1.5" y="3" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4" />
                     <path d="M2 4.5l6 4.5 6-4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
@@ -274,19 +276,19 @@ export const Login: React.FC = () => {
                     placeholder={t('login.placeholder_email')}
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="w-full bg-[#131a24] border border-[#222b38] rounded-lg py-2.5 pl-9.5 pr-3.5 text-sm text-[#e7e9ec] placeholder-[#5e6a7a] focus:outline-none focus:border-[#1ec8b5] focus:bg-[#1a222e] transition-colors"
+                    className="input-field input-field-icon-pad"
                     required
                   />
                 </div>
               </div>
 
               {/* Password Field */}
-              <div className="mb-4.5">
-                <label className="block text-xs font-medium text-[#9aa5b3] mb-2" htmlFor="password">
+              <div className="auth-form-field">
+                <label className="input-label" htmlFor="password">
                   {t('login.label_password')}
                 </label>
-                <div className="relative">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5e6a7a] pointer-events-none" viewBox="0 0 16 16" fill="none">
+                <div className="auth-field-relative">
+                  <svg className="auth-field-icon" viewBox="0 0 16 16" fill="none">
                     <rect x="3" y="7" width="10" height="7" rx="1.4" stroke="currentColor" stroke-width="1.4" />
                     <path d="M5.5 7V4.8a2.5 2.5 0 0 1 5 0V7" stroke="currentColor" stroke-width="1.4" />
                   </svg>
@@ -296,13 +298,13 @@ export const Login: React.FC = () => {
                     placeholder={t('login.placeholder_password')}
                     value={form.password}
                     onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    className="w-full bg-[#131a24] border border-[#222b38] rounded-lg py-2.5 pl-9.5 pr-10.5 text-sm text-[#e7e9ec] placeholder-[#5e6a7a] focus:outline-none focus:border-[#1ec8b5] focus:bg-[#1a222e] transition-colors"
+                    className="input-field input-field-icon-pad pr-10.5"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#5e6a7a] hover:text-[#9aa5b3] transition-colors bg-transparent border-none cursor-pointer"
+                    className="auth-field-btn"
                   >
                     <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none">
                       <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.3" />
@@ -314,14 +316,12 @@ export const Login: React.FC = () => {
 
               {/* Role Chip Selector (Signup Mode only) */}
               {isSignup && (
-                <div className="flex gap-2 mb-6">
+                <div className="auth-role-row">
                   <button
                     type="button"
                     onClick={() => setRole('candidate')}
-                    className={`flex-1 text-center py-2 border rounded-lg text-xs font-mono transition-all cursor-pointer ${
-                      role === 'candidate'
-                        ? 'border-[#1ec8b5] text-[#1ec8b5] bg-[#1ec8b5]/5 font-semibold'
-                        : 'border-[#222b38] text-[#5e6a7a] hover:border-[#5e6a7a] hover:text-[#9aa5b3]'
+                    className={`auth-role-btn ${
+                      role === 'candidate' ? 'auth-role-btn-cand-active' : 'auth-role-btn-inactive'
                     }`}
                   >
                     {t('login.role_candidate')}
@@ -329,10 +329,8 @@ export const Login: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setRole('interviewer')}
-                    className={`flex-1 text-center py-2 border rounded-lg text-xs font-mono transition-all cursor-pointer ${
-                      role === 'interviewer'
-                        ? 'border-[#cba135] text-[#cba135] bg-[#cba135]/5 font-semibold'
-                        : 'border-[#222b38] text-[#5e6a7a] hover:border-[#5e6a7a] hover:text-[#9aa5b3]'
+                    className={`auth-role-btn ${
+                      role === 'interviewer' ? 'auth-role-btn-int-active' : 'auth-role-btn-inactive'
                     }`}
                   >
                     {t('login.role_interviewer')}
@@ -341,13 +339,13 @@ export const Login: React.FC = () => {
               )}
 
               {/* Remember and Forgot password link */}
-              <div className="flex justify-between items-center text-[12.8px] mb-6">
-                <label className="flex items-center gap-2 text-[#9aa5b3] cursor-pointer">
+              <div className="auth-remember-row">
+                <label className="auth-checkbox-label">
                   <input
                     type="checkbox"
                     checked={form.remember}
                     onChange={(e) => setForm({ ...form, remember: e.target.checked })}
-                    className="w-4.5 h-4.5 accent-[#1ec8b5] cursor-pointer"
+                    className="auth-checkbox"
                   />
                   {t('login.keep_signed_in')}
                 </label>
@@ -374,7 +372,7 @@ export const Login: React.FC = () => {
               </Button>
             </form>
 
-            <p className="text-center text-[11px] leading-relaxed text-[#5e6a7a]">
+            <p className="auth-terms">
               {t('login.terms_note')}
             </p>
           </div>

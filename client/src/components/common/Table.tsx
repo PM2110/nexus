@@ -21,21 +21,21 @@ export function Table<T extends Record<string, any>>({
   const { t } = useTranslation();
 
   return (
-    <div className="w-full overflow-x-auto premium-scrollbar rounded-xl border border-[#222b38] bg-[#0d1219]">
-      <table className="w-full border-collapse text-left text-sm text-neutral-300">
-        <thead className="bg-[#131a24] text-xs font-semibold text-neutral-400 uppercase tracking-wider border-b border-[#222b38]">
+    <div className="table-wrapper premium-scrollbar">
+      <table className="table-root">
+        <thead className="table-head">
           <tr>
             {columns.map((col) => (
-              <th key={col.key} className="px-6 py-4 font-medium">
+              <th key={col.key} className="table-th">
                 {col.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-[#222b38]/50">
+        <tbody className="table-body">
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="px-6 py-10 text-center text-neutral-500 italic">
+              <td colSpan={columns.length} className="table-td-empty">
                 {t('common.table_no_data')}
               </td>
             </tr>
@@ -44,12 +44,12 @@ export function Table<T extends Record<string, any>>({
               <tr
                 key={row.id || rowIndex}
                 onClick={() => onRowClick?.(row)}
-                className={`transition-colors duration-150 ${
-                  onRowClick ? 'cursor-pointer hover:bg-neutral-800/40' : 'hover:bg-neutral-800/20'
+                className={`table-row ${
+                  onRowClick ? 'table-row-clickable' : 'table-row-static'
                 }`}
               >
                 {columns.map((col) => (
-                  <td key={col.key} className="px-6 py-4 whitespace-nowrap">
+                  <td key={col.key} className="table-td">
                     {col.render ? col.render(row, rowIndex) : row[col.key]}
                   </td>
                 ))}

@@ -30,15 +30,15 @@ export const HomeHero: React.FC = () => {
   }, []);
 
   return (
-    <header className="pt-48 pb-24 relative">
-      <div className="max-w-[1180px] mx-auto px-8 relative z-10 text-center flex flex-col gap-14 items-center">
+    <header className="hero-header">
+      <div className="section-container relative z-10 text-center flex flex-col gap-14 items-center">
         <div>
-          <div className="inline-flex items-center gap-2 font-mono text-[11.8px] tracking-widest text-[#1ec8b5] bg-[#1ec8b5]/8 border border-[#1ec8b5]/25 px-3.5 py-1.5 rounded-full mb-7 rise-in">
+          <div className="hero-eyebrow">
             <span className="w-1.5 h-1.5 rounded-full bg-[#1ec8b5] shadow-[0_0_0_0_rgba(30,200,181,0.45)] animate-[pulseDot_2.2s_infinite]" />
             {t('hero.eyebrow')}
           </div>
           
-          <h1 className="font-serif font-normal text-4.5xl md:text-[70px] leading-[1.07] tracking-tight max-w-[900px] mx-auto rise-in">
+          <h1 className="hero-headline">
             {t('hero.headline_main')}<br />
             {t('hero.headline_sub')}{' '}
             <span className="italic text-[#1ec8b5]">
@@ -46,12 +46,12 @@ export const HomeHero: React.FC = () => {
             </span>
           </h1>
           
-          <p className="max-w-[560px] mx-auto mt-6 text-[#9aa5b3] text-lg leading-[1.65] rise-in">
+          <p className="hero-subtitle">
             {t('hero.sub')}
           </p>
         </div>
 
-        <div className="flex gap-4.5 justify-center flex-wrap rise-in">
+        <div className="hero-buttons">
           <Button
             variant="primary"
             size="lg"
@@ -76,14 +76,14 @@ export const HomeHero: React.FC = () => {
           </Button>
         </div>
 
-        {/* Monaco style mockup editor */}
-        <div className="w-full max-w-[920px] mx-auto text-left bg-[#0d1219] border border-[#222b38] rounded-2xl overflow-hidden shadow-2xl relative z-10 rise-in">
-          <div className="flex justify-between items-center px-4.5 py-3.5 bg-[#131a24] border-b border-[#222b38]">
+        {/* Monaco style mockup editor using shared CSS classes */}
+        <div className="editor-mockup">
+          <div className="editor-header">
             <div className="flex items-center gap-2.5">
               <div className="flex gap-1.5">
-                <span className="w-2.8 h-2.8 rounded-full bg-[#222b38]" />
-                <span className="w-2.8 h-2.8 rounded-full bg-[#222b38]" />
-                <span className="w-2.8 h-2.8 rounded-full bg-[#222b38]" />
+                <span className="editor-circle-btn" />
+                <span className="editor-circle-btn" />
+                <span className="editor-circle-btn" />
               </div>
               <span className="font-mono text-[12.5px] text-[#5e6a7a] ml-1.5">{t('hero.editor_file')}</span>
             </div>
@@ -93,7 +93,7 @@ export const HomeHero: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-7 font-mono text-[13.8px] leading-[1.9] relative min-h-[280px]">
+          <div className="editor-body">
             <div className="flex"><span className="w-7 text-[#5e6a7a] opacity-60 select-none">1</span><span className="text-[#5e6a7a] italic">// shared-sheet · live</span></div>
             <div className="flex"><span className="w-7 text-[#5e6a7a] opacity-60 select-none">2</span><span className="text-[#9aa5b3]"><span className="text-[#cba135]">function</span> <span className="text-[#7fb8e0]">twoSum</span>(nums, target) &#123;</span></div>
             <div className="flex"><span className="w-7 text-[#5e6a7a] opacity-60 select-none">3</span><span className="text-[#9aa5b3]">&nbsp; <span className="text-[#cba135]">const</span> seen = <span className="text-[#cba135]">new</span> <span className="text-[#7fb8e0]">Map</span>();</span></div>
@@ -113,24 +113,24 @@ export const HomeHero: React.FC = () => {
 
             {/* Simulated cursor tags */}
             <div
-              className="absolute font-mono text-[9.8px] font-semibold px-2 py-0.5 rounded-tr rounded-br rounded-bl text-[#0a0e14] bg-[#1ec8b5] transition-all duration-[0.9s] ease-[cubic-bezier(.16,.8,.3,1)] pointer-events-none"
+              className="editor-tag-t"
               style={{ top: `${currentPos.teal.top}px`, left: `${currentPos.teal.left}px` }}
             >
               Manan
             </div>
             <div
-              className="absolute font-mono text-[9.8px] font-semibold px-2 py-0.5 rounded-tr rounded-br rounded-bl text-[#0a0e14] bg-[#cba135] transition-all duration-[0.9s] ease-[cubic-bezier(.16,.8,.3,1)] pointer-events-none"
+              className="editor-tag-g"
               style={{ top: `${currentPos.gold.top}px`, left: `${currentPos.gold.left}px` }}
             >
               Alex
             </div>
             <div
-              className="absolute h-[25px] rounded bg-[#1ec8b5]/16 transition-all duration-[0.9s] ease-[cubic-bezier(.16,.8,.3,1)] pointer-events-none"
+              className="editor-tag-selection"
               style={{ top: `${currentPos.sel.top}px`, left: `${currentPos.sel.left}px`, width: `${currentPos.sel.width}px` }}
             />
           </div>
 
-          <div className="flex justify-between items-center px-4.5 py-2.8 bg-[#131a24] border-t border-[#222b38] font-mono text-[11.5px] text-[#5e6a7a]">
+          <div className="editor-footer">
             <div className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80]" />
               {t('hero.editor_collaborators')}

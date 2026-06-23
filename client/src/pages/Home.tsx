@@ -10,6 +10,7 @@ export const Home: React.FC = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [activeSection, setActiveSection] = useState<string>('');
 
   // Monitor scroll for nav styling and background parallax layers
   useEffect(() => {
@@ -21,6 +22,36 @@ export const Home: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // IntersectionObserver to detect and highlight active section in viewport
+  useEffect(() => {
+    const sectionIds = ['features', 'workspaces', 'workflow'];
+    const elements = sectionIds.map(id => document.getElementById(id));
+    
+    const observerOptions = {
+      root: null,
+      rootMargin: '-40% 0px -50% 0px', // Trigger when section occupies the mid-viewport
+      threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    }, observerOptions);
+
+    elements.forEach(el => {
+      if (el) observer.observe(el);
+    });
+
+    return () => {
+      elements.forEach(el => {
+        if (el) observer.unobserve(el);
+      });
+    };
+  }, []);
+
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     const el = document.getElementById(id);
@@ -30,7 +61,7 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen text-[#e7e9ec] bg-[#0a0e14] font-sans selection:bg-[#14837a] selection:text-white relative overflow-x-hidden">
+    <div className="page-wrapper">
       
       {/* Parallax ambient background gradients */}
       <div
@@ -47,12 +78,9 @@ export const Home: React.FC = () => {
       />
 
       {/* NAVIGATION BAR */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 py-5 backdrop-blur-md bg-[#0a0e14]/60 border-b transition-all duration-300 ${isScrolled ? 'border-[#222b38] bg-[#0a0e14]/85' : 'border-transparent'}`}>
-        <div className="max-w-[1180px] mx-auto px-8 flex items-center justify-between">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2.5 font-serif font-semibold text-[21px] tracking-wide bg-transparent border-none p-0 cursor-pointer text-[#e7e9ec]"
-          >
+      <nav className={`nav-bar ${isScrolled ? 'nav-bar-scrolled' : 'nav-bar-transparent'}`}>
+        <div className="nav-container">
+          <button onClick={() => navigate('/')} className="nav-logo">
             <svg className="w-7 h-7" viewBox="0 0 32 32" fill="none">
               <circle cx="16" cy="16" r="3" fill="#1ec8b5" />
               <circle cx="16" cy="16" r="10.5" stroke="#1ec8b5" stroke-width="1.3" opacity="0.8" />
@@ -61,25 +89,25 @@ export const Home: React.FC = () => {
             </svg>
             {t('common.brand')}
           </button>
-          <div className="flex items-center gap-9 text-[14.2px] text-[#9aa5b3]">
+          <div className="nav-links">
             <a
               href="#features"
               onClick={(e) => handleNavClick(e, 'features')}
-              className="hover:text-white transition-colors relative after:content-[''] after:absolute after:left-0 after:bottom-[-6px] after:w-0 after:h-[1px] after:bg-[#1ec8b5] after:transition-all hover:after:w-full"
+              className={`nav-link ${activeSection === 'features' ? 'nav-link-active' : 'nav-link-inactive'}`}
             >
               {t('nav.features')}
             </a>
             <a
               href="#workspaces"
               onClick={(e) => handleNavClick(e, 'workspaces')}
-              className="hover:text-white transition-colors relative after:content-[''] after:absolute after:left-0 after:bottom-[-6px] after:w-0 after:h-[1px] after:bg-[#1ec8b5] after:transition-all hover:after:w-full"
+              className={`nav-link ${activeSection === 'workspaces' ? 'nav-link-active' : 'nav-link-inactive'}`}
             >
               {t('nav.workspaces')}
             </a>
             <a
               href="#workflow"
               onClick={(e) => handleNavClick(e, 'workflow')}
-              className="hover:text-white transition-colors relative after:content-[''] after:absolute after:left-0 after:bottom-[-6px] after:w-0 after:h-[1px] after:bg-[#1ec8b5] after:transition-all hover:after:w-full"
+              className={`nav-link ${activeSection === 'workflow' ? 'nav-link-active' : 'nav-link-inactive'}`}
             >
               {t('nav.how_it_works')}
             </a>
@@ -105,10 +133,10 @@ export const Home: React.FC = () => {
       <HomeHero />
 
       {/* TRUST / TOPICS SECTION */}
-      <section className="py-12.5 text-center relative z-10 border-t border-[#222b38]/40">
-        <div className="max-w-[1180px] mx-auto px-8">
-          <div className="font-mono text-[11.5px] tracking-widest text-[#5e6a7a] mb-7.5">{t('trust.label')}</div>
-          <div className="flex justify-center items-center gap-14 flex-wrap text-[#5e6a7a] font-mono text-[14.8px] opacity-75">
+      <section className="trust-section">
+        <div className="section-container">
+          <div className="eyebrow-faint">{t('trust.label')}</div>
+          <div className="trust-list">
             <span>{t('trust.mock_interviews')}</span>
             <span>{t('trust.dsa_practice')}</span>
             <span>{t('trust.pair_programming')}</span>
@@ -120,22 +148,22 @@ export const Home: React.FC = () => {
 
       {/* PROBLEM & COMPARISON SECTION */}
       <section className="py-32 relative z-10">
-        <div className="max-w-[1180px] mx-auto px-8">
-          <div className="text-center max-w-[640px] mx-auto mb-16 rise-in">
-            <div className="font-mono text-[11.8px] tracking-widest text-[#cba135] uppercase mb-3.5">{t('problem.eyebrow')}</div>
-            <h2 className="font-serif font-normal text-3xl md:text-[42px] leading-[1.18] tracking-tight mb-4">
+        <div className="section-container">
+          <div className="section-header rise-in">
+            <div className="eyebrow-gold">{t('problem.eyebrow')}</div>
+            <h2 className="section-title">
               {t('problem.title_main')}<br />{t('problem.title_sub')}
             </h2>
-            <p className="text-[#9aa5b3] text-[16.3px] leading-relaxed">{t('problem.sub')}</p>
+            <p className="section-subtitle">{t('problem.sub')}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-[1px] bg-[#222b38] border border-[#222b38] rounded-2xl overflow-hidden max-w-[980px] mx-auto rise-in">
+          <div className="problem-grid">
             {/* Today's Stack */}
-            <div className="bg-[#0d1219] p-8 md:p-9.5">
+            <div className="problem-col-today">
               <div className="font-mono text-[11.5px] tracking-widest text-[#5e6a7a] uppercase mb-5 flex items-center gap-2">{t('problem.today_stack')}</div>
-              <ul className="flex flex-col gap-5.5">
+              <ul className="problem-list">
                 {[1, 2, 3, 4, 5].map((idx) => (
-                  <li key={idx} className="flex items-start gap-3.5 text-[#9aa5b3] text-[14.8px] leading-relaxed">
+                  <li key={idx} className="problem-item-today">
                     <svg className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#5e6a7a]" viewBox="0 0 16 16" fill="none">
                       <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                     </svg>
@@ -145,11 +173,11 @@ export const Home: React.FC = () => {
               </ul>
             </div>
             {/* Nexus Stack */}
-            <div className="bg-[#131a24] p-8 md:p-9.5">
+            <div className="problem-col-nexus">
               <div className="font-mono text-[11.5px] tracking-widest text-[#1ec8b5] uppercase mb-5 flex items-center gap-2">{t('problem.nexus_stack')}</div>
-              <ul className="flex flex-col gap-5.5">
+              <ul className="problem-list">
                 {[1, 2, 3, 4, 5].map((idx) => (
-                  <li key={idx} className="flex items-start gap-3.5 text-[#e7e9ec] text-[14.8px] leading-relaxed">
+                  <li key={idx} className="problem-item-nexus">
                     <svg className="w-4.5 h-4.5 flex-shrink-0 text-[#1ec8b5]" viewBox="0 0 16 16" fill="none">
                       <path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
@@ -164,14 +192,14 @@ export const Home: React.FC = () => {
 
       {/* FEATURE GRID SECTION */}
       <section className="py-22.5 relative z-10" id="features">
-        <div className="max-w-[1180px] mx-auto px-8">
-          <div className="text-center max-w-[640px] mx-auto mb-16 rise-in">
-            <div className="font-mono text-[11.8px] tracking-widest text-[#1ec8b5] uppercase mb-3.5">{t('features.eyebrow')}</div>
-            <h2 className="font-serif font-normal text-3xl md:text-[42px] leading-[1.18] tracking-tight mb-4">{t('features.title')}</h2>
-            <p className="text-[#9aa5b3] text-[16.3px] leading-relaxed">{t('features.sub')}</p>
+        <div className="section-container">
+          <div className="section-header rise-in">
+            <div className="eyebrow-teal">{t('features.eyebrow')}</div>
+            <h2 className="section-title">{t('features.title')}</h2>
+            <p className="section-subtitle">{t('features.sub')}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-[1px] bg-[#222b38] border border-[#222b38] rounded-2xl overflow-hidden rise-in">
+          <div className="features-grid">
             {/* Feature Cards */}
             {[
               { key: 'editor', stroke: '#1ec8b5', path: 'M4 17l5-5-5-5M12 19h8' },
@@ -181,8 +209,8 @@ export const Home: React.FC = () => {
               { key: 'run', stroke: '#1ec8b5', path: 'M5 3v18l7-4 7 4V3z' },
               { key: 'chat', stroke: '#cba135', path: 'M4 4h16v12H7l-3 3V4z' }
             ].map((feat) => (
-              <div key={feat.key} className="bg-[#0d1219] hover:bg-[#131a24] p-8 transition-colors duration-300 relative text-left">
-                <div className="w-9.5 h-9.5 rounded-lg flex items-center justify-center bg-[#1a222e] border border-[#222b38] mb-5">
+              <div key={feat.key} className="feature-card">
+                <div className="feature-icon-wrapper">
                   {feat.key === 'cursor' ? (
                     <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke={feat.stroke} strokeWidth="1.6">
                       <circle cx="12" cy="12" r="9" />
@@ -194,8 +222,10 @@ export const Home: React.FC = () => {
                     </svg>
                   )}
                 </div>
-                <h4 className="text-[16.5px] font-semibold text-[#e7e9ec] mb-2.5">{t(`features.${feat.key}_title`)}</h4>
-                <p className="text-[#9aa5b3] text-[14.2px] leading-relaxed">{t(`features.${feat.key}_desc`)}</p>
+                <div className="feature-content">
+                  <h4 className="feature-title">{t(`features.${feat.key}_title`)}</h4>
+                  <p className="feature-desc">{t(`features.${feat.key}_desc`)}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -206,46 +236,46 @@ export const Home: React.FC = () => {
       <HomeWorkspaceShowcase />
 
       {/* STATS BAND SECTION */}
-      <section className="py-20 border-y border-[#222b38] relative z-10">
-        <div className="max-w-[1180px] mx-auto px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 text-center rise-in">
+      <section className="stats-section">
+        <div className="section-container">
+          <div className="stats-grid rise-in">
             <div>
-              <div className="font-serif text-3xl md:text-[45px] text-[#e7e9ec] mb-2 font-normal"><span className="text-[#1ec8b5]">{t('stats.sheets_num').split(' ')[0]}</span> {t('stats.sheets_num').split(' ')[1]}</div>
-              <div className="text-[13.8px] text-[#5e6a7a] font-mono">{t('stats.sheets_label')}</div>
+              <div className="stat-value"><span className="text-[#1ec8b5]">{t('stats.sheets_num').split(' ')[0]}</span> {t('stats.sheets_num').split(' ')[1]}</div>
+              <div className="stat-label">{t('stats.sheets_label')}</div>
             </div>
             <div>
-              <div className="font-serif text-3xl md:text-[45px] text-[#e7e9ec] mb-2 font-normal">{t('stats.langs_num')}</div>
-              <div className="text-[13.8px] text-[#5e6a7a] font-mono">{t('stats.langs_label')}</div>
+              <div className="stat-value">{t('stats.langs_num')}</div>
+              <div className="stat-label">{t('stats.langs_label')}</div>
             </div>
             <div>
-              <div className="font-serif text-3xl md:text-[45px] text-[#e7e9ec] mb-2 font-normal">{t('stats.latency_num')}</div>
-              <div className="text-[13.8px] text-[#5e6a7a] font-mono">{t('stats.latency_label')}</div>
+              <div className="stat-value">{t('stats.latency_num')}</div>
+              <div className="stat-label">{t('stats.latency_label')}</div>
             </div>
             <div>
-              <div className="font-serif text-3xl md:text-[45px] text-[#e7e9ec] mb-2 font-normal">{t('stats.link_num')}</div>
-              <div className="text-[13.8px] text-[#5e6a7a] font-mono">{t('stats.link_label')}</div>
+              <div className="stat-value">{t('stats.link_num')}</div>
+              <div className="stat-label">{t('stats.link_label')}</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* TIMELINE / WORKFLOW SECTION */}
-      <section className="py-30 relative z-10" id="workflow">
-        <div className="max-w-[1180px] mx-auto px-8">
-          <div className="text-center max-w-[640px] mx-auto mb-16 rise-in">
-            <div className="font-mono text-[11.8px] tracking-widest text-[#1ec8b5] uppercase mb-3.5">{t('workflow.eyebrow')}</div>
-            <h2 className="font-serif font-normal text-3xl md:text-[42px] leading-[1.18] tracking-tight mb-4">{t('workflow.title')}</h2>
+      <section className="workflow-section" id="workflow">
+        <div className="section-container">
+          <div className="section-header rise-in">
+            <div className="eyebrow-teal">{t('workflow.eyebrow')}</div>
+            <h2 className="section-title">{t('workflow.title')}</h2>
           </div>
 
-          <div className="max-w-[760px] mx-auto relative before:content-[''] before:absolute before:left-[23px] before:top-2 before:bottom-2 before:w-[1px] before:bg-gradient-to-b before:from-[#222b38] before:via-[#1ec8b5] before:to-[#222b38] before:opacity-50 rise-in">
+          <div className="workflow-timeline">
             {[1, 2, 3, 4].map((step) => (
-              <div key={step} className="flex gap-6.5 pb-12 last:pb-0 relative text-left">
-                <div className="w-12 h-12 flex-shrink-0 rounded-full bg-[#0d1219] border border-[#222b38] flex items-center justify-center font-mono font-semibold text-[13.6px] text-[#9aa5b3] relative z-10 border-t-[#1ec8b5] border-r-[#1ec8b5]">
+              <div key={step} className="workflow-step rise-in">
+                <div className="workflow-step-badge">
                   {t(`workflow.step_${step}_num`)}
                 </div>
-                <div className="pt-2">
-                  <h4 className="text-[17.3px] font-semibold text-[#e7e9ec] mb-2">{t(`workflow.step_${step}_title`)}</h4>
-                  <p className="text-[#9aa5b3] text-[14.8px] leading-relaxed max-w-[480px]">{t(`workflow.step_${step}_desc`)}</p>
+                <div className="workflow-step-content">
+                  <h4 className="workflow-step-title">{t(`workflow.step_${step}_title`)}</h4>
+                  <p className="workflow-step-desc">{t(`workflow.step_${step}_desc`)}</p>
                 </div>
               </div>
             ))}
@@ -254,24 +284,24 @@ export const Home: React.FC = () => {
       </section>
 
       {/* TESTIMONIAL QUOTE BAND */}
-      <section className="py-25 text-center relative z-10 border-t border-[#222b38]/30">
-        <div className="max-w-[1180px] mx-auto px-8">
-          <div className="font-serif text-[64px] leading-none text-[#1ec8b5] opacity-40 mb-2.5">"</div>
-          <blockquote className="font-serif italic font-normal text-2.5xl md:text-[32px] leading-[1.45] max-w-[760px] mx-auto mb-6 text-[#e7e9ec]">
+      <section className="quote-section">
+        <div className="section-container">
+          <div className="quote-mark">"</div>
+          <blockquote className="quote-blockquote">
             {t('quote.text')}
           </blockquote>
-          <div className="text-[#5e6a7a] font-mono text-[13.6px]">{t('quote.author')}</div>
+          <div className="quote-author">{t('quote.author')}</div>
         </div>
       </section>
 
       {/* FINAL CALL TO ACTION CARD */}
-      <section className="py-30 relative z-10">
-        <div className="max-w-[1180px] mx-auto px-8">
-          <div className="max-w-[780px] mx-auto p-12 md:p-16 rounded-[20px] border border-[#222b38] bg-gradient-to-br from-[rgba(30,200,181,0.06)] via-[rgba(19,26,36,0.85)] to-[rgba(203,161,53,0.04)] relative overflow-hidden rise-in text-center">
-            <h2 className="font-serif font-normal text-3xl md:text-[40px] mb-4 leading-tight">
+      <section className="cta-section">
+        <div className="section-container">
+          <div className="cta-card">
+            <h2 className="cta-title">
               {t('final_cta.title_main')}<br />{t('final_cta.title_sub')}
             </h2>
-            <p className="text-[#9aa5b3] text-lg mb-8.5 max-w-[500px] mx-auto">{t('final_cta.sub')}</p>
+            <p className="cta-subtitle">{t('final_cta.sub')}</p>
             <Button
               variant="primary"
               size="lg"
@@ -289,14 +319,11 @@ export const Home: React.FC = () => {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-14 border-t border-[#222b38] relative z-10 text-left">
-        <div className="max-w-[1180px] mx-auto px-8">
-          <div className="grid grid-cols-1 md:grid-cols-[1.6fr_1fr_1fr_1fr] gap-10 mb-12">
+      <footer className="footer-section">
+        <div className="section-container">
+          <div className="footer-grid mb-12">
             <div>
-              <button
-                onClick={() => navigate('/')}
-                className="flex items-center gap-2.5 font-serif font-semibold text-[21px] tracking-wide mb-3.5 bg-transparent border-none p-0 cursor-pointer text-[#e7e9ec]"
-              >
+              <button onClick={() => navigate('/')} className="nav-logo mb-3.5">
                 <svg className="w-7 h-7" viewBox="0 0 32 32" fill="none">
                   <circle cx="16" cy="16" r="3" fill="#1ec8b5" />
                   <circle cx="16" cy="16" r="10.5" stroke="#1ec8b5" stroke-width="1.3" opacity="0.8" />
@@ -305,57 +332,57 @@ export const Home: React.FC = () => {
                 </svg>
                 {t('common.brand')}
               </button>
-              <p className="text-[#5e6a7a] text-[14px] leading-relaxed max-w-[280px]">{t('footer.tagline')}</p>
+              <p className="footer-col-desc">{t('footer.tagline')}</p>
             </div>
             <div>
-              <h5 className="font-mono text-[11.8px] text-[#5e6a7a] uppercase tracking-wider mb-4">{t('footer.heading_product')}</h5>
+              <h5 className="footer-column-title">{t('footer.heading_product')}</h5>
               <a
                 href="#features"
                 onClick={(e) => handleNavClick(e, 'features')}
-                className="block text-[#9aa5b3] text-[14.2px] py-1.5 hover:text-[#1ec8b5] transition-colors"
+                className="footer-link"
               >
                 {t('nav.features')}
               </a>
               <a
                 href="#workspaces"
                 onClick={(e) => handleNavClick(e, 'workspaces')}
-                className="block text-[#9aa5b3] text-[14.2px] py-1.5 hover:text-[#1ec8b5] transition-colors"
+                className="footer-link"
               >
                 {t('nav.workspaces')}
               </a>
               <a
                 href="#workflow"
                 onClick={(e) => handleNavClick(e, 'workflow')}
-                className="block text-[#9aa5b3] text-[14.2px] py-1.5 hover:text-[#1ec8b5] transition-colors"
+                className="footer-link"
               >
                 {t('nav.how_it_works')}
               </a>
             </div>
             <div>
-              <h5 className="font-mono text-[11.8px] text-[#5e6a7a] uppercase tracking-wider mb-4">{t('footer.heading_platforms')}</h5>
-              <a href="#" className="block text-[#9aa5b3] text-[14.2px] py-1.5 hover:text-[#1ec8b5] transition-colors">{t('footer.link_lc')}</a>
-              <span className="block text-[#5e6a7a] text-[14.2px] py-1.5 select-none">{t('footer.link_cf')}</span>
-              <span className="block text-[#5e6a7a] text-[14.2px] py-1.5 select-none">{t('footer.link_hr')}</span>
+              <h5 className="footer-column-title">{t('footer.heading_platforms')}</h5>
+              <a href="#" className="footer-link">{t('footer.link_lc')}</a>
+              <span className="footer-link-disabled">{t('footer.link_cf')}</span>
+              <span className="footer-link-disabled">{t('footer.link_hr')}</span>
             </div>
             <div>
-              <h5 className="font-mono text-[11.8px] text-[#5e6a7a] uppercase tracking-wider mb-4">{t('footer.heading_get_started')}</h5>
+              <h5 className="footer-column-title">{t('footer.heading_get_started')}</h5>
               <Button
                 variant="text"
                 onClick={() => navigate('/login')}
-                className="block text-[#9aa5b3] text-[14.2px] py-1.5 hover:text-[#1ec8b5] transition-colors text-left"
+                className="footer-link text-left p-0!"
               >
                 {t('common.sign_in')}
               </Button>
               <Button
                 variant="text"
                 onClick={() => navigate('/login')}
-                className="block text-[#9aa5b3] text-[14.2px] py-1.5 hover:text-[#1ec8b5] transition-colors text-left"
+                className="footer-link text-left p-0!"
               >
                 {t('common.create_workspace')}
               </Button>
             </div>
           </div>
-          <div className="flex justify-between items-center pt-7 border-t border-[#1a212c] text-[#5e6a7a] text-[13px] font-mono">
+          <div className="footer-bottom">
             <span>{t('footer.copyright')}</span>
             <span>{t('footer.status')}</span>
           </div>
