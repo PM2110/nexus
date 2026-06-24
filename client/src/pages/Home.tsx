@@ -26,7 +26,7 @@ export const Home: React.FC = () => {
   useEffect(() => {
     const sectionIds = ['features', 'workspaces', 'workflow'];
     const elements = sectionIds.map(id => document.getElementById(id));
-    
+
     const observerOptions = {
       root: null,
       rootMargin: '-40% 0px -50% 0px', // Trigger when section occupies the mid-viewport
@@ -62,7 +62,7 @@ export const Home: React.FC = () => {
 
   return (
     <div className="page-wrapper">
-      
+
       {/* Parallax ambient background gradients */}
       <div
         className="fixed inset-0 bg-[radial-gradient(ellipse_800px_500px_at_15%_-5%,rgba(30,200,181,0.18),transparent_60%)] opacity-50 pointer-events-none z-0 transition-transform duration-75 ease-out"

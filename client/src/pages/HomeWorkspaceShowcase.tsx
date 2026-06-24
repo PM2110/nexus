@@ -70,8 +70,10 @@ export const HomeWorkspaceShowcase: React.FC = () => {
                   <span className="editor-circle-btn" />
                   <span className="editor-circle-btn" />
                 </div>
-                <span className="text-[#cba135]">const</span> result <span className="text-[#5e6a7a]">=</span> <span className="text-[#7fb8e0]">solve</span>(input);<br />
-                <span className="text-[#5e6a7a] italic">// Manan & Alex — editing</span>
+                <span className="text-[#5e6a7a] italic">// public-sheet.ts — visible to everyone connected (4 users)</span><br />
+                <span className="text-[#cba135]">const</span> solve <span className="text-[#5e6a7a]">=</span> (nums: number[], target: number) <span className="text-[#cba135]">=&gt;</span> &#123;<br />
+                &nbsp;&nbsp;<span className="text-[#5e6a7a] italic">// Everyone can see, type, and execute this code in real time</span><br />
+                &#125;;
               </div>
             </div>
           )}
@@ -89,8 +91,11 @@ export const HomeWorkspaceShowcase: React.FC = () => {
                   <span className="editor-circle-btn" />
                   <span className="editor-circle-btn" />
                 </div>
-                <span className="text-[#5e6a7a] italic">// Alex's sheet — brute force draft</span><br />
-                <span className="text-[#cba135]">for</span> (i, j) &#123; ... &#125;
+                <span className="text-[#5e6a7a] italic">// restricted-draft-sheet.ts</span><br />
+                <span className="text-[#5e6a7a] italic">// Visible only to: [ Manan Patel, Sarah Jenkins ]</span><br />
+                <span className="text-[#cba135]">function</span> testTwoPointer(nums) &#123;<br />
+                &nbsp;&nbsp;<span className="text-[#5e6a7a] italic">// Hidden from Alex and Dave during independent drafting</span><br />
+                &#125;
               </div>
             </div>
           )}
@@ -108,8 +113,9 @@ export const HomeWorkspaceShowcase: React.FC = () => {
                   <span className="editor-circle-btn" />
                   <span className="editor-circle-btn" />
                 </div>
-                <span className="text-[#5e6a7a] italic">Time: O(n) · Space: O(n)</span><br />
-                <span className="text-[#5e6a7a] italic">Edge case: empty array, no pair found</span>
+                <span className="text-[#5e6a7a] italic"># Session Brainstorming Notes (Public to Room)</span><br />
+                <span className="text-[#5e6a7a] italic">- Time complexity goal: O(N) using Hash Map</span><br />
+                <span className="text-[#5e6a7a] italic">- Handle duplicates: skip already processed indices</span>
               </div>
             </div>
           )}
@@ -121,14 +127,22 @@ export const HomeWorkspaceShowcase: React.FC = () => {
                 <h3 className="panel-title">{t('showcase.final_title')}</h3>
                 <p className="panel-desc">{t('showcase.final_desc')}</p>
               </div>
-              <div className="panel-code-box">
+              <div className="panel-code-box flex flex-col justify-between">
                 <div className="flex gap-1.5 mb-3.5">
                   <span className="editor-circle-btn" />
                   <span className="editor-circle-btn" />
                   <span className="editor-circle-btn" />
                 </div>
-                <span className="text-[#5e6a7a] italic">// Final — reviewed & locked</span><br />
-                <span className="text-[#cba135]">export default</span> <span className="text-[#7fb8e0]">twoSum</span>;
+                <div className="border border-[#1a212c] bg-[#121620] p-4 rounded-md">
+                  <div className="text-xs font-mono text-[#9aa5b3] mb-2 font-bold">CREATE NEW SHEET</div>
+                  <div className="text-xs text-[#5e6a7a] mb-3">Sheet Name: <span className="text-[#1ec8b5]">binary-search-opt</span></div>
+                  <div className="text-xs text-[#5e6a7a] mb-4">
+                    Visibility:<br />
+                    <span className="text-white">[✓] All Room Users</span><br />
+                    <span className="text-[#9aa5b3]">[ ] Select Collaborators (Manan, Sarah...)</span>
+                  </div>
+                  <div className="text-[11px] font-mono text-[#cba135] bg-[#cba135]/10 px-2.5 py-1 rounded inline-block">Create Sheet</div>
+                </div>
               </div>
             </div>
           )}
