@@ -1,17 +1,5 @@
-import React from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
-
-export interface Column<T> {
-  key: string;
-  header: string;
-  render?: (row: T, index: number) => React.ReactNode;
-}
-
-interface TableProps<T> {
-  columns: Column<T>[];
-  data: T[];
-  onRowClick?: (row: T) => void;
-}
+import type { TableProps } from '../../types';
 
 export function Table<T extends Record<string, any>>({
   columns,
@@ -44,9 +32,8 @@ export function Table<T extends Record<string, any>>({
               <tr
                 key={row.id || rowIndex}
                 onClick={() => onRowClick?.(row)}
-                className={`table-row ${
-                  onRowClick ? 'table-row-clickable' : 'table-row-static'
-                }`}
+                className={`table-row ${onRowClick ? 'table-row-clickable' : 'table-row-static'
+                  }`}
               >
                 {columns.map((col) => (
                   <td key={col.key} className="table-td">

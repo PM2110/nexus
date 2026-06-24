@@ -79,14 +79,7 @@ Participants join using an invite link.
 
 A coding problem is imported from a supported platform.
 
-The workspace automatically generates multiple collaborative environments:
-
-* Shared Solution Space
-* Personal Workspaces
-* Notes Workspace
-* Final Solution Workspace
-
-Participants can independently explore approaches while remaining connected inside the same problem room.
+The workspace automatically generates a default collaborative sheet visible to everyone. Participants can dynamically create additional sheets, choosing to keep them visible to everyone or restricting visibility to selected users for private drafts or small-group collaboration.
 
 ---
 
@@ -149,39 +142,33 @@ Roles:
 
 ## Multi-Sheet Collaborative Architecture
 
-### Shared Sheet
+### Default Public Sheets
 
-A synchronized coding environment where all participants collaborate on a common solution.
+Synchronized coding environments where all participants collaborate on a common sheet by default.
 
 Use Cases:
 
 * Pair Programming
-* Final Solution Development
 * Collaborative Debugging
+* Final Submission Reviews
 
 ---
 
-### Personal Sheets
+### Restricted Custom Sheets
 
-Dedicated coding environments for each participant.
+Dynamically created coding environments where the creator selects which specific users can view or edit the sheet.
 
 Use Cases:
 
-* Exploring alternative solutions
-* Independent thinking
-* Experimentation
-
----
-
-### Final Solution Sheet
-
-A dedicated workspace for finalized implementations.
+* Exploring alternative solutions privately
+* Independent brainstorming in a sandbox
+* Mentorship check-ins with limited visibility
 
 ---
 
 ### Notes Workspace
 
-Collaborative text editor for:
+Collaborative text note sheets visible to all participants.
 
 * Observations
 * Complexity Analysis
@@ -582,14 +569,8 @@ Synchronizes:
 * id
 * workspace_id
 * name
-* type
-
-Types:
-
-* Shared
-* Personal
-* Final
-* Notes
+* is_public
+* allowed_users (relationship or array)
 
 ---
 

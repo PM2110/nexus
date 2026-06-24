@@ -1,13 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import enTranslations from '../locales/en.json';
-
-type Translations = Record<string, any>;
-
-interface TranslationContextType {
-  t: (key: string, replacements?: Record<string, string | number>) => string;
-  locale: string;
-  setLocale: (locale: string) => void;
-}
+import type { Translations, TranslationContextType } from '../types';
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
 

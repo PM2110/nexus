@@ -1,103 +1,65 @@
-import express from 'express';
-import http from 'http';
-import { Server } from 'socket.io';
-import cors from 'cors';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 
-// Load environment variables
-dotenv.config();
+import express, { Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import authRouter from './routes/auth.routes';
+import { initDb } from './config/db';
+import { config } from './config/env';
 
 const app = express();
-const port = process.env.PORT || 4000;
 
-// Middleware
 app.use(cors({
-  origin: '*', // Allow all in development; tighten in production
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like curl, backend to backend, or local tests)
+    if (!origin) return callback(null, true);
+    if (config.ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
+  credentials: true,
 }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Basic health check route
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Nexus API is running smoothly' });
+// Standard logger middleware
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
 });
 
-// Create HTTP server
-const server = http.createServer(app);
+// API Routes
+app.use('/api/auth', authRouter);
 
-// Initialize Socket.IO
-const io = new Server(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-  }
+// Health Check
+app.get('/api/health', (req: Request, res: Response) => {
+  res.status(200).json({ status: 'ok', message: 'Nexus API is running smoothly' });
 });
 
-// Socket presence & state mapping
-const activeUsers = new Map<string, { username: string; activeSheet: string }>();
+// 404 handler for unmatched routes
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ error: 'NotFound', message: 'The requested resource does not exist' });
+});
 
-io.on('connection', (socket) => {
-  console.log(`User connected: ${socket.id}`);
+// Global central error handler middleware
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error('Unhandled server error:', err);
+  const status = err.status || 500;
+  res.status(status).json({
+    error: err.name || 'InternalServerError',
+    message: err.message || 'An unexpected error occurred on the server',
+  });
+});
 
-  // Join a workspace room
-  socket.on('join-workspace', ({ workspaceId, username }) => {
-    socket.join(workspaceId);
-    activeUsers.set(socket.id, { username, activeSheet: 'Shared' });
-    
-    // Broadcast join event
-    socket.to(workspaceId).emit('user-joined', {
-      id: socket.id,
-      username,
-      activeSheet: 'Shared'
+// Bootstrap server after database connection check
+initDb()
+  .then(() => {
+    app.listen(config.PORT, () => {
+      console.log(`Nexus API Server is listening on port ${config.PORT}`);
     });
-
-    console.log(`${username} joined workspace: ${workspaceId}`);
+  })
+  .catch((err) => {
+    console.error('Fatal database initialization failed. Exiting process.', err);
+    process.exit(1);
   });
-
-  // Track cursor movement
-  socket.on('cursor-move', ({ workspaceId, cursor }) => {
-    socket.to(workspaceId).emit('cursor-update', {
-      userId: socket.id,
-      cursor
-    });
-  });
-
-  // Handle active sheet transitions
-  socket.on('sheet-change', ({ workspaceId, sheetName }) => {
-    const user = activeUsers.get(socket.id);
-    if (user) {
-      user.activeSheet = sheetName;
-      socket.to(workspaceId).emit('user-sheet-updated', {
-        userId: socket.id,
-        activeSheet: sheetName
-      });
-    }
-  });
-
-  // Handle workspace messages (chat)
-  socket.on('send-message', ({ workspaceId, content, sender }) => {
-    io.to(workspaceId).emit('receive-message', {
-      id: `${Date.now()}-${Math.random()}`,
-      content,
-      sender,
-      timestamp: new Date().toISOString()
-    });
-  });
-
-  socket.on('disconnect', () => {
-    const user = activeUsers.get(socket.id);
-    if (user) {
-      console.log(`User disconnected: ${user.username}`);
-      // Notify rooms
-      socket.broadcast.emit('user-left', {
-        id: socket.id,
-        username: user.username
-      });
-      activeUsers.delete(socket.id);
-    }
-  });
-});
-
-// Start the server
-server.listen(port, () => {
-  console.log(`Nexus server is listening on port ${port}`);
-});

@@ -75,7 +75,7 @@
 
 .section-header {
   text-align: center;
-  max-width: 640px;
+  max-width: 800px;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 4rem;
@@ -544,7 +544,7 @@
 .stat-value {
   font-family: var(--font-serif);
   font-size: 1.35rem;
-  /* prevent wrapping on mobile */
+  white-space: nowrap;
   color: var(--text);
   margin-bottom: 0.5rem;
   font-weight: 400;
@@ -552,13 +552,13 @@
 
 @media (min-width: 480px) {
   .stat-value {
-    font-size: 1.875rem;
+    font-size: 1.8rem;
   }
 }
 
 @media (min-width: 768px) {
   .stat-value {
-    font-size: 45px;
+    font-size: 38px;
   }
 }
 

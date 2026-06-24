@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
 import { Button } from '../components/common/Button';
+import { useAuth } from '../context/AuthContext';
 import { HomeHero } from './HomeHero';
 import { HomeWorkspaceShowcase } from './HomeWorkspaceShowcase';
 
 export const Home: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState<string>('');
@@ -26,7 +28,7 @@ export const Home: React.FC = () => {
   useEffect(() => {
     const sectionIds = ['features', 'workspaces', 'workflow'];
     const elements = sectionIds.map(id => document.getElementById(id));
-    
+
     const observerOptions = {
       root: null,
       rootMargin: '-40% 0px -50% 0px', // Trigger when section occupies the mid-viewport
@@ -62,7 +64,7 @@ export const Home: React.FC = () => {
 
   return (
     <div className="page-wrapper">
-      
+
       {/* Parallax ambient background gradients */}
       <div
         className="fixed inset-0 bg-[radial-gradient(ellipse_800px_500px_at_15%_-5%,rgba(30,200,181,0.18),transparent_60%)] opacity-50 pointer-events-none z-0 transition-transform duration-75 ease-out"
@@ -111,20 +113,48 @@ export const Home: React.FC = () => {
             >
               {t('nav.how_it_works')}
             </a>
-            <Button
-              variant="text"
-              onClick={() => navigate('/login')}
-              className="text-[#9aa5b3] hover:text-white"
-            >
-              {t('common.sign_in')}
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => navigate('/login')}
-            >
-              {t('common.start_session')}
-            </Button>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2.5">
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user.name}
+                      className="w-8 h-8 rounded-full border border-[#1ec8b5]/20 object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-[#131a24] border border-[#222b38] flex items-center justify-center font-mono text-xs font-semibold text-[#1ec8b5]">
+                      {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'U'}
+                    </div>
+                  )}
+                  <span className="text-sm font-medium text-[#9aa5b3] hidden sm:inline">{user?.name}</span>
+                </div>
+                <Button
+                  variant="text"
+                  onClick={logout}
+                  className="text-xs text-[#5e6a7a] hover:text-[#e0596b] transition-colors p-0 bg-transparent border-none cursor-pointer"
+                >
+                  Sign out
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button
+                  variant="text"
+                  onClick={() => navigate('/login')}
+                  className="text-[#9aa5b3] hover:text-white"
+                >
+                  {t('common.sign_in')}
+                </Button>
+                <Button
+                  variant="primary"
+                  size="md"
+                  onClick={() => navigate('/login')}
+                >
+                  {t('common.start_session')}
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </nav>

@@ -1,13 +1,6 @@
 import React from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
-
-interface PaginationProps {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-  totalItems?: number;
-  itemsPerPage?: number;
-}
+import type { PaginationProps } from '../../types';
 
 export const Pagination: React.FC<PaginationProps> = ({
   currentPage,
