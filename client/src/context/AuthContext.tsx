@@ -1,13 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { User, AuthContextType } from '../types';
+import { authService } from '../services';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const rawApiUrl = import.meta.env.VITE_API_URL;
-if (!rawApiUrl) {
-  throw new Error('VITE_API_URL environment variable is not defined.');
-}
-const API_URL = `${rawApiUrl}/auth`;
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -16,7 +11,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Initialize Auth State from localStorage
   useEffect(() => {
-    const storedToken = localStorage.getItem('nexus_token') || sessionStorage.getItem('nexus_token');
+    const storedToken = localStorage.getItem('nexus_access_token') || sessionStorage.getItem('nexus_access_token');
     const storedUser = localStorage.getItem('nexus_user') || sessionStorage.getItem('nexus_user');
 
     if (storedToken && storedUser) {
@@ -28,23 +23,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string, remember: boolean) => {
     try {
-      const response = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
+      const data = await authService.login(email, password);
 
       setToken(data.token);
       setUser(data.user);
 
       const storage = remember ? localStorage : sessionStorage;
-      storage.setItem('nexus_token', data.token);
+      storage.setItem('nexus_access_token', data.token);
       storage.setItem('nexus_user', JSON.stringify(data.user));
 
       return { success: true, message: data.message || 'Logged in successfully' };
@@ -55,23 +40,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signup = async (name: string, email: string, password: string, role: string) => {
     try {
-      const response = await fetch(`${API_URL}/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, role }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Signup failed');
-      }
+      const data = await authService.signup(name, email, password, role);
 
       setToken(data.token);
       setUser(data.user);
 
       // Default to session storage on register, can be changed
-      sessionStorage.setItem('nexus_token', data.token);
+      sessionStorage.setItem('nexus_access_token', data.token);
       sessionStorage.setItem('nexus_user', JSON.stringify(data.user));
 
       return { success: true, message: data.message || 'Signed up successfully' };
@@ -82,17 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const forgotPassword = async (email: string) => {
     try {
-      const response = await fetch(`${API_URL}/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to request reset');
-      }
+      const data = await authService.forgotPassword(email);
 
       return {
         success: true,
@@ -106,17 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetPassword = async (email: string, token: string, password: string) => {
     try {
-      const response = await fetch(`${API_URL}/reset-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, token, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to reset password');
-      }
+      const data = await authService.resetPassword(email, token, password);
 
       return { success: true, message: data.message || 'Password reset successful' };
     } catch (error: any) {
@@ -127,9 +82,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem('nexus_token');
+    localStorage.removeItem('nexus_access_token');
     localStorage.removeItem('nexus_user');
-    sessionStorage.removeItem('nexus_token');
+    sessionStorage.removeItem('nexus_access_token');
     sessionStorage.removeItem('nexus_user');
   };
 

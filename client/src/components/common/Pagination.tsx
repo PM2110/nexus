@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
-import { PaginationProps } from '../../types';
+import type { PaginationProps } from '../../types';
 
 export const Pagination: React.FC<PaginationProps> = ({
   currentPage,

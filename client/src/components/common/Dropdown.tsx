@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
-import { DropdownOption, DropdownProps } from '../../types';
+import type { DropdownProps } from '../../types';
 
 export const Dropdown: React.FC<DropdownProps> = ({
   options,
