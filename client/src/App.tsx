@@ -6,7 +6,7 @@ import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { WorkspaceJoin } from './pages/WorkspaceJoin';
 import { WorkspaceDetail } from './pages/WorkspaceDetail';
-import './styles/common.css';
+import './styles/base.css';
 
 // Simple guard for authenticated routes
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {

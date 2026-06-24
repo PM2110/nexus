@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { EyeIcon, EyeOffIcon, AlertCircleIcon } from './Icons';
 import type { InputProps } from '../../types';
+import '../../styles/form.css';
 
 export const Input: React.FC<InputProps> = ({
   label,

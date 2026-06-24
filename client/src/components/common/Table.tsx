@@ -1,5 +1,6 @@
 import { useTranslation } from '../../hooks/useTranslation';
 import type { TableProps } from '../../types';
+import '../../styles/table.css';
 
 export function Table<T extends Record<string, any>>({
   columns,

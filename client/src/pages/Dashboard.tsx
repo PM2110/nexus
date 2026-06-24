@@ -1,28 +1,27 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { workspaceService, friendService } from '../services';
-import { Button } from '../components/common/Button';
 import { SearchInput } from '../components/common/SearchInput';
 import { InfiniteScroll } from '../components/common/InfiniteScroll';
 import {
   FolderIcon,
   SpinnerIcon,
-  BellIcon
+  PlusIcon,
+  JoinIcon
 } from '../components/common/Icons';
 import type { Workspace, Friend, FriendRequest } from '../types';
 
 // Extracted Subcomponents
-import { DashboardNavbar } from '../components/dashboard/DashboardNavbar';
+import { Navbar } from '../components/common/Navbar';
 import { WorkspaceCard } from '../components/dashboard/WorkspaceCard';
 import { FriendRequestItem } from '../components/dashboard/FriendRequestItem';
 import { FriendItem } from '../components/dashboard/FriendItem';
 import { JoinWorkspaceModal } from '../components/dashboard/JoinWorkspaceModal';
 import { CreateWorkspaceModal } from '../components/dashboard/CreateWorkspaceModal';
+import '../styles/dashboard.css';
 
 export const Dashboard: React.FC = () => {
-  const { user, logout } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -32,13 +31,12 @@ export const Dashboard: React.FC = () => {
 
   // Invite requests / Notifications
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
-  const [isLoadingRequests, setIsLoadingRequests] = useState(true);
 
   // Friends list with search and infinite scroll
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendsPage, setFriendsPage] = useState(1);
   const [friendsSearch, setFriendsSearch] = useState('');
-  const [hasMoreFriends, setHasMoreFriends] = useState(true);
+  const [hasMoreFriends, setHasMoreFriends] = useState(false);
   const [isLoadingFriends, setIsLoadingFriends] = useState(false);
 
   // Modal controls
@@ -57,7 +55,7 @@ export const Dashboard: React.FC = () => {
   const [selectorFriends, setSelectorFriends] = useState<Friend[]>([]);
   const [selectorSearch, setSelectorSearch] = useState('');
   const [selectorPage, setSelectorPage] = useState(1);
-  const [selectorHasMore, setSelectorHasMore] = useState(true);
+  const [selectorHasMore, setSelectorHasMore] = useState(false);
   const [selectorLoading, setSelectorLoading] = useState(false);
 
   // Add friend panel state
@@ -65,7 +63,7 @@ export const Dashboard: React.FC = () => {
   const [userSearchResult, setUserSearchResult] = useState<any[]>([]);
   const [userSearchTerm, setUserSearchTerm] = useState('');
   const [userSearchPage, setUserSearchPage] = useState(1);
-  const [userSearchHasMore, setUserSearchHasMore] = useState(true);
+  const [userSearchHasMore, setUserSearchHasMore] = useState(false);
   const [userSearchLoading, setUserSearchLoading] = useState(false);
 
   // Fetch workspaces
@@ -83,14 +81,11 @@ export const Dashboard: React.FC = () => {
 
   // Fetch incoming friend requests
   const fetchFriendRequests = useCallback(async () => {
-    setIsLoadingRequests(true);
     try {
       const data = await friendService.getFriendRequests();
       setFriendRequests(data.requests);
     } catch (err: any) {
       console.error('Error fetching requests:', err);
-    } finally {
-      setIsLoadingRequests(false);
     }
   }, []);
 
@@ -304,64 +299,57 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="page-wrapper min-h-screen bg-[#0a0e14]">
-      {/* Background radial effects */}
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_800px_400px_at_15%_0%,rgba(30,200,181,0.08),transparent_60%)] pointer-events-none z-0" />
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_600px_350px_at_85%_90%,rgba(203,161,53,0.05),transparent_60%)] pointer-events-none z-0" />
+      {/* Background ambient elements */}
+      <div className="ambient" />
 
       {/* Navigation */}
-      <DashboardNavbar user={user} logout={logout} scrollToSection={scrollToSection} />
+      <Navbar scrollToSection={scrollToSection} />
+
+      {/* Dashboard Header */}
+      <div className="wrap-xl dash-header">
+        <div className="dash-eyebrow rise" style={{ animationDelay: '.05s' }}>
+          <span className="glow-dot" /> SESSION ACTIVE
+        </div>
+      </div>
 
       {/* Main Grid */}
-      <div className="section-container max-w-7xl pt-28 pb-10 relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Left Side: Workspaces list (takes 2 cols on desktop) */}
-        <div id="workspaces-section" className="lg:col-span-2 flex flex-col gap-6 scroll-mt-24">
-          <div className="flex items-center justify-between">
+      <main className="wrap-xl dash-grid">
+
+        {/* LEFT: WORKSPACES */}
+        <div id="workspaces-section" className="rise scroll-mt-24" style={{ animationDelay: '.1s' }}>
+          <div className="dash-title-row">
             <div>
-              <h1 className="text-2xl font-serif text-white font-medium">{t('dashboard.workspaces_title')}</h1>
-              <p className="text-sm text-[#5e6a7a] mt-1 font-mono">{t('dashboard.workspaces_subtitle')}</p>
+              <h1 className="dash-title">{t('dashboard.workspaces_title')}</h1>
+              <p className="dash-subtitle">{t('dashboard.workspaces_subtitle')}</p>
             </div>
-            <div className="flex gap-3.5 flex-shrink-0">
-              <Button variant="outline" size="md" onClick={() => setIsJoinOpen(true)}>
+            <div className="dash-actions">
+              <button className="btn btn-outline" onClick={() => setIsJoinOpen(true)}>
+                <JoinIcon />
                 {t('dashboard.btn_join_workspace')}
-              </Button>
-              <Button
-                variant="primary"
-                size="md"
-                onClick={openCreateModal}
-                className="bg-[#1ec8b5] hover:bg-[#1ec8b5]/90 text-[#0a0e14] border-none shadow-[0_4px_12px_rgba(30,200,181,0.2)]"
-              >
+              </button>
+              <button className="btn btn-primary" onClick={openCreateModal}>
+                <PlusIcon />
                 {t('dashboard.btn_new_workspace')}
-              </Button>
+              </button>
             </div>
           </div>
 
           {/* Workspaces list view */}
           {isLoadingWorkspaces ? (
             <div className="flex flex-col gap-4 py-12 items-center justify-center">
-              <SpinnerIcon size={32} className="text-[#1ec8b5]" />
+              <SpinnerIcon size={32} className="text-[#1ec8b5] animate-spin" />
               <span className="text-xs text-[#5e6a7a] font-mono">{t('dashboard.fetching_workspaces')}</span>
             </div>
           ) : workspaces.length === 0 ? (
-            <div className="border border-dashed border-[#222b38] rounded-xl p-12 text-center flex flex-col items-center gap-4 bg-[#0d1219]/30">
-              <div className="w-12 h-12 rounded-full bg-[#131a24] border border-[#222b38] flex items-center justify-center text-[#5e6a7a]">
-                <FolderIcon size={24} />
+            <div className="empty-state" onClick={openCreateModal} style={{ cursor: 'pointer' }}>
+              <div className="empty-icon">
+                <FolderIcon size={22} />
               </div>
-              <div>
-                <h3 className="text-sm font-medium text-white">{t('dashboard.no_workspaces_title')}</h3>
-                <p className="text-xs text-[#5e6a7a] mt-1 max-w-sm">{t('dashboard.no_workspaces_desc')}</p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={openCreateModal}
-                className="mt-2 text-xs border-[#1ec8b5]/30 hover:border-[#1ec8b5] hover:bg-[#1ec8b5]/5 text-[#1ec8b5]"
-              >
-                {t('dashboard.btn_create_first_workspace')}
-              </Button>
+              <h3>{t('dashboard.no_workspaces_title')}</h3>
+              <p>{t('dashboard.no_workspaces_desc')}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="ws-grid">
               {workspaces.map((w) => (
                 <WorkspaceCard
                   key={w.id}
@@ -370,20 +358,29 @@ export const Dashboard: React.FC = () => {
                   onOpen={(id) => navigate(`/workspace/${id}`)}
                 />
               ))}
+
+              {/* empty-style CTA card slot */}
+              <div className="empty-state" style={{ padding: '30px 20px', cursor: 'pointer' }} onClick={openCreateModal}>
+                <div className="empty-icon">
+                  <PlusIcon size={18} />
+                </div>
+                <h3>Start a new session</h3>
+                <p>Spin up a workspace and import a problem in seconds.</p>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Right Side: Sidebar Panels (takes 1 col) */}
-        <div className="flex flex-col gap-6">
-          
+        {/* RIGHT: SIDEBAR */}
+        <div className="rise" style={{ animationDelay: '.26s' }}>
+
           {/* Notifications Panel */}
           {friendRequests.length > 0 && (
-            <div className="border border-[#222b38] rounded-xl p-5 bg-[#0d1219] flex flex-col gap-4">
-              <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#e0596b] animate-ping" />
+            <div className="side-panel">
+              <div className="side-panel-title">
+                <span className="glow-dot danger" />
                 {t('dashboard.notifications_title')}
-              </h3>
+              </div>
               <div className="flex flex-col gap-3">
                 {friendRequests.map((req) => (
                   <FriendRequestItem
@@ -398,38 +395,46 @@ export const Dashboard: React.FC = () => {
           )}
 
           {/* Friends List Panel */}
-          <div id="friends-section" className="border border-[#222b38] rounded-xl p-5 bg-[#0d1219] flex flex-col gap-4 scroll-mt-24">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-white">{t('dashboard.nav_friends')}</h3>
-              <button onClick={toggleAddFriend} className="text-xs text-[#1ec8b5] hover:underline font-mono cursor-pointer bg-transparent border-none">
-                {showAddFriend ? t('dashboard.btn_close_search') : t('dashboard.btn_add_friend')}
+          <div id="friends-section" className="side-panel scroll-mt-24">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div className="side-panel-title">{t('dashboard.nav_friends')}</div>
+              <button onClick={toggleAddFriend} className="add-friend-link">
+                {showAddFriend ? t('dashboard.btn_close_search') : `+ ${t('dashboard.btn_add_friend')}`}
               </button>
             </div>
 
             {/* Send request search sub-panel */}
             {showAddFriend && (
-              <div className="border border-[#222b38] p-3 rounded-lg bg-[#131a24]/50 flex flex-col gap-3 animate-[fadeIn_0.2s_ease]">
-                <p className="text-[11px] text-[#5e6a7a] font-mono">{t('dashboard.search_developers_desc')}</p>
+              <div className="add-friend-box">
+                <p className="add-friend-desc">{t('dashboard.search_developers_desc')}</p>
                 <SearchInput placeholder={t('dashboard.search_placeholder')} onSearch={handleUserSearch} debounceMs={300} />
-                
-                <div className="max-h-48 overflow-y-auto pr-1 flex flex-col gap-2">
+
+                <div className="search-results max-h-48 overflow-y-auto mt-2 flex flex-col gap-2">
                   <InfiniteScroll loadMore={loadMoreUserSearch} hasMore={userSearchHasMore} isLoading={userSearchLoading}>
                     {userSearchResult.length === 0 ? (
                       <p className="text-[11px] text-[#5e6a7a] py-2 text-center italic">{t('dashboard.no_developers_found')}</p>
                     ) : (
                       userSearchResult.map((u) => (
-                        <div key={u.id} className="flex items-center justify-between gap-2 p-1.5 rounded hover:bg-[#0d1219]/50 transition-colors">
-                          <div className="flex items-center gap-2 min-w-0">
+                        <div key={u.id} className="friend-row justify-between">
+                          <div className="flex items-center gap-3">
                             {u.avatar ? (
-                              <img src={u.avatar} alt={u.name} className="w-6 h-6 rounded-full object-cover" />
+                              <img src={u.avatar} alt={u.name} className="friend-avatar object-cover" />
                             ) : (
-                              <div className="w-6 h-6 rounded-full bg-[#0a0e14] border border-[#222b38] flex items-center justify-center font-mono text-[9px] text-[#1ec8b5] font-semibold">{u.name.substring(0, 1).toUpperCase()}</div>
+                              <div className="friend-avatar">
+                                {u.name.substring(0, 2).toUpperCase()}
+                              </div>
                             )}
-                            <span className="text-[12px] text-[#9aa5b3] truncate">{u.name}</span>
+                            <div>
+                              <div className="friend-name">{u.name}</div>
+                              <div className="friend-email">{u.email}</div>
+                            </div>
                           </div>
-                          <Button variant="secondary" size="sm" onClick={() => handleSendFriendRequest(u.id)} className="text-[10px] py-1 px-2.5">
+                          <button
+                            onClick={() => handleSendFriendRequest(u.id)}
+                            className="btn btn-primary btn-xs"
+                          >
                             {t('dashboard.add')}
-                          </Button>
+                          </button>
                         </div>
                       ))
                     )}
@@ -441,7 +446,7 @@ export const Dashboard: React.FC = () => {
             {/* Standard Friends list with Search and Infinite Scroll */}
             <SearchInput placeholder="Search friends list..." onSearch={handleFriendsSearch} debounceMs={200} />
 
-            <div className="max-h-72 overflow-y-auto pr-1 flex flex-col gap-2.5">
+            <div className="friends-scroll">
               <InfiniteScroll loadMore={loadMoreFriends} hasMore={hasMoreFriends} isLoading={isLoadingFriends} loader={<div className="text-center py-2 text-xs text-[#5e6a7a]">Loading...</div>}>
                 {friends.length === 0 ? (
                   <p className="text-xs text-[#5e6a7a] text-center py-4 italic">{t('dashboard.no_friends_added')}</p>
@@ -454,7 +459,7 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
       {/* Join Workspace Modal */}
       <JoinWorkspaceModal
@@ -481,3 +486,4 @@ export const Dashboard: React.FC = () => {
     </div>
   );
 };
+

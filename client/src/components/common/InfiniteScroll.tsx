@@ -22,6 +22,16 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   threshold = 0.1,
 }) => {
   const detectorRef = useRef<HTMLDivElement | null>(null);
+  const loadMoreRef = useRef(loadMore);
+  const isLoadingRef = useRef(isLoading);
+
+  useEffect(() => {
+    loadMoreRef.current = loadMore;
+  }, [loadMore]);
+
+  useEffect(() => {
+    isLoadingRef.current = isLoading;
+  }, [isLoading]);
 
   useEffect(() => {
     const currentDetector = detectorRef.current;
@@ -30,8 +40,8 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry.isIntersecting && !isLoading) {
-          loadMore();
+        if (entry.isIntersecting && !isLoadingRef.current) {
+          loadMoreRef.current();
         }
       },
       {
@@ -48,7 +58,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
         observer.unobserve(currentDetector);
       }
     };
-  }, [loadMore, hasMore, isLoading, threshold]);
+  }, [hasMore, threshold]);
 
   const defaultLoader = (
     <div className="flex justify-center items-center py-4 gap-2">

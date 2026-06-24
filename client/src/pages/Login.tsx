@@ -5,6 +5,7 @@ import { Button } from '../components/common/Button';
 import { Input } from '../components/common/Input';
 import { Form } from '../components/common/Form';
 import { useAuth } from '../context/AuthContext';
+import '../styles/auth.css';
 import {
   BrandIcon,
   GoogleIcon,
@@ -352,7 +353,7 @@ export const Login: React.FC = () => {
             )}
 
             <Form error={error} success={success} onSubmit={handleSubmit}>
-              
+
               {/* Role Selection (Signup Mode only) */}
               {mode === 'signup' && (
                 <div className="auth-role-row mb-4">
@@ -471,12 +472,12 @@ export const Login: React.FC = () => {
                 {submitting
                   ? 'Processing...'
                   : mode === 'signup'
-                  ? t('login.btn_create_account')
-                  : mode === 'login'
-                  ? t('login.btn_sign_in')
-                  : mode === 'forgot'
-                  ? t('login.btn_send_code')
-                  : t('login.btn_reset_password')}
+                    ? t('login.btn_create_account')
+                    : mode === 'login'
+                      ? t('login.btn_sign_in')
+                      : mode === 'forgot'
+                        ? t('login.btn_send_code')
+                        : t('login.btn_reset_password')}
               </Button>
             </Form>
 

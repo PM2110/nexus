@@ -1,0 +1,74 @@
+/* form.css */
+.input-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  color: var(--text);
+  font-size: 0.875rem;
+  transition: all 0.2s var(--ease);
+}
+
+.input-field:hover {
+  border-color: var(--text-faint);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 1px var(--teal);
+  background-color: var(--raised);
+}
+
+.input-field-icon-pad {
+  padding-left: 2.5rem;
+}
+
+.search-field {
+  position: relative;
+}
+
+.search-field input {
+  width: 100%;
+  background: var(--void);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 12px 9px 34px;
+  font-size: 0.78rem;
+  color: var(--text);
+  outline: none;
+  transition: all .25s var(--ease);
+  font-family: 'Inter', sans-serif;
+}
+
+.search-field input::placeholder {
+  color: var(--text-faint);
+}
+
+.search-field input:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 1px rgba(30, 200, 181, 0.25);
+  background: var(--raised);
+}
+
+.search-field svg {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: var(--text-faint);
+  pointer-events: none;
+}

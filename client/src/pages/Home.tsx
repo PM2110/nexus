@@ -5,12 +5,14 @@ import { Button } from '../components/common/Button';
 import { useAuth } from '../context/AuthContext';
 import { HomeHero } from './HomeHero';
 import { HomeWorkspaceShowcase } from './HomeWorkspaceShowcase';
+import { Navbar } from '../components/common/Navbar';
+import '../styles/home.css';
 
 export const Home: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { isAuthenticated, user, logout } = useAuth();
-  const [isScrolled, setIsScrolled] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const [_, setIsScrolled] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState<string>('');
 
@@ -85,94 +87,11 @@ export const Home: React.FC = () => {
         className="fixed inset-0 bg-[linear-gradient(#1a212c_1px,transparent_1px),linear-gradient(90deg,#1a212c_1px,transparent_1px)] bg-[size:64px_64px] opacity-18 [mask-image:radial-gradient(ellipse_900px_600px_at_50%_0%,black,transparent_70%)] pointer-events-none z-0 transition-transform duration-75 ease-out"
         style={{ transform: `translateY(${-scrollY * 0.04}px)` }}
       />
-
       {/* NAVIGATION BAR */}
-      <nav className={`nav-bar ${isScrolled ? 'nav-bar-scrolled' : 'nav-bar-transparent'}`}>
-        <div className="nav-container">
-          <button onClick={() => navigate('/')} className="nav-logo">
-            <svg className="w-7 h-7" viewBox="0 0 32 32" fill="none">
-              <circle cx="16" cy="16" r="3" fill="#1ec8b5" />
-              <circle cx="16" cy="16" r="10.5" stroke="#1ec8b5" stroke-width="1.3" opacity="0.8" />
-              <ellipse cx="16" cy="16" rx="14" ry="6" stroke="#cba135" stroke-width="1.2" opacity="0.75" transform="rotate(28 16 16)" />
-              <ellipse cx="16" cy="16" rx="14" ry="6" stroke="#cba135" stroke-width="1.2" opacity="0.4" transform="rotate(-28 16 16)" />
-            </svg>
-            {t('common.brand')}
-          </button>
-          <div className="nav-links">
-            <a
-              href="#features"
-              onClick={(e) => handleNavClick(e, 'features')}
-              className={`nav-link ${activeSection === 'features' ? 'nav-link-active' : 'nav-link-inactive'}`}
-            >
-              {t('nav.features')}
-            </a>
-            <a
-              href="#workspaces"
-              onClick={(e) => handleNavClick(e, 'workspaces')}
-              className={`nav-link ${activeSection === 'workspaces' ? 'nav-link-active' : 'nav-link-inactive'}`}
-            >
-              {t('nav.workspaces')}
-            </a>
-            <a
-              href="#workflow"
-              onClick={(e) => handleNavClick(e, 'workflow')}
-              className={`nav-link ${activeSection === 'workflow' ? 'nav-link-active' : 'nav-link-inactive'}`}
-            >
-              {t('nav.how_it_works')}
-            </a>
-            {isAuthenticated ? (
-              <div className="flex items-center gap-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate('/dashboard')}
-                  className="text-xs py-1.5 px-3 border-[#1ec8b5]/20 text-[#1ec8b5] hover:bg-[#1ec8b5]/5 hover:border-[#1ec8b5]"
-                >
-                  Dashboard
-                </Button>
-                <div className="flex items-center gap-2.5">
-                  {user?.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt={user.name}
-                      className="w-8 h-8 rounded-full border border-[#1ec8b5]/20 object-cover"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-[#131a24] border border-[#222b38] flex items-center justify-center font-mono text-xs font-semibold text-[#1ec8b5]">
-                      {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'U'}
-                    </div>
-                  )}
-                  <span className="text-sm font-medium text-[#9aa5b3] hidden sm:inline">{user?.name}</span>
-                </div>
-                <Button
-                  variant="text"
-                  onClick={logout}
-                  className="text-xs text-[#5e6a7a] hover:text-[#e0596b] transition-colors p-0 bg-transparent border-none cursor-pointer"
-                >
-                  Sign out
-                </Button>
-              </div>
-            ) : (
-              <>
-                <Button
-                  variant="text"
-                  onClick={() => navigate('/login')}
-                  className="text-[#9aa5b3] hover:text-white"
-                >
-                  {t('common.sign_in')}
-                </Button>
-                <Button
-                  variant="primary"
-                  size="md"
-                  onClick={() => navigate('/login')}
-                >
-                  {t('common.start_session')}
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
+      <Navbar
+        activeSection={activeSection}
+        onNavClick={handleNavClick}
+      />
 
       {/* HERO SECTION */}
       <HomeHero />

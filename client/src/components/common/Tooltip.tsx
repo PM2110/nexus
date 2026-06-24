@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { TooltipProps } from '../../types';
+import '../../styles/tooltip.css';
 
 export const Tooltip: React.FC<TooltipProps> = ({
   content,

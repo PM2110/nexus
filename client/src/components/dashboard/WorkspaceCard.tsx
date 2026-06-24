@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
-import { Button } from '../common/Button';
-import { CopyIcon, ExternalLinkIcon } from '../common/Icons';
+import { LinkIcon, ExternalLinkIcon, ArrowRightTailIcon } from '../common/Icons';
 
 interface WorkspaceCardProps {
   workspace: any;
@@ -16,62 +15,99 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  return (
-    <div className="border border-[#222b38] hover:border-[#1ec8b5]/30 rounded-xl p-5 bg-[#0d1219] hover:bg-[#0d1219]/80 transition-all duration-300 group flex flex-col justify-between gap-4 h-full relative">
-      <div>
-        {/* Header */}
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-sm font-semibold text-white group-hover:text-[#1ec8b5] transition-colors line-clamp-1">
-            {workspace.name}
-          </h3>
-          {workspace.problemPlatform && (
-            <span className="text-[9px] font-mono text-[#cba135] bg-[#cba135]/5 border border-[#cba135]/20 px-2 py-0.5 rounded uppercase tracking-wider">
-              {workspace.problemPlatform}
-            </span>
-          )}
-        </div>
+  const getPlatformClass = (platform?: string) => {
+    if (!platform) return 'pill-custom';
+    const p = platform.toLowerCase();
+    if (p.includes('leetcode')) return 'pill-leetcode';
+    if (p.includes('codeforces')) return 'pill-codeforces';
+    return 'pill-custom';
+  };
 
-        {/* Problem URL (if any) */}
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onCopyLink(workspace.inviteCode);
+  };
+
+  const handleProblemClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    e.currentTarget.style.setProperty('--mx', `${x}%`);
+    e.currentTarget.style.setProperty('--my', `${y}%`);
+  };
+
+  return (
+    <div className="ws-card rise" onClick={() => onOpen(workspace.id)} onMouseMove={handleMouseMove}>
+      <div className="ws-card-top">
+        <h3 className="ws-card-name">{workspace.name}</h3>
+        {workspace.problemPlatform && (
+          <span className={`ws-platform-pill ${getPlatformClass(workspace.problemPlatform)}`}>
+            {workspace.problemPlatform.toUpperCase()}
+          </span>
+        )}
+      </div>
+
+      <div className="ws-card-meta">
         {workspace.problemUrl ? (
           <a
             href={workspace.problemUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[11px] text-[#5e6a7a] hover:text-[#1ec8b5] font-mono mt-1.5 flex items-center gap-1 max-w-[220px] truncate transition-colors"
+            onClick={handleProblemClick}
+            className="ws-meta-link"
           >
-            <ExternalLinkIcon size={12} className="flex-shrink-0" />
+            <ExternalLinkIcon size={13} />
             {workspace.problemUrl}
           </a>
         ) : (
-          <p className="text-[11px] text-[#5e6a7a] italic mt-1.5 font-mono">
-            No problem linked
-          </p>
+          <div className="ws-meta-link italic">
+            {t('dashboard.no_problem_linked', { defaultValue: 'No problem linked' })}
+          </div>
+        )}
+
+        {workspace.owner && (
+          <div className="ws-owner-row">
+            {workspace.owner.avatar ? (
+              <img
+                src={workspace.owner.avatar}
+                alt={workspace.owner.name}
+                className="ws-owner-avatar object-cover"
+              />
+            ) : (
+              <div className="ws-owner-avatar">
+                {workspace.owner.name.substring(0, 2).toUpperCase()}
+              </div>
+            )}
+            <span className="ws-owner-name">
+              {workspace.owner.name} {workspace.myRole === 'owner' ? `(${t('dashboard.owner_label', { defaultValue: 'Owner' })})` : ''}
+            </span>
+          </div>
         )}
       </div>
 
-      {/* Footer options */}
-      <div className="flex items-center justify-between border-t border-[#222b38]/50 pt-3 mt-1">
-        <span className="text-[11px] text-[#5e6a7a] font-mono">
+      <div className="ws-card-footer">
+        <span className="ws-participants">
           {workspace.membersCount || 1} {t('dashboard.participant')}
         </span>
-        <div className="flex items-center gap-2.5">
+        <div className="ws-card-actions">
           <button
-            onClick={() => onCopyLink(workspace.inviteCode)}
-            className="p-1.5 rounded hover:bg-[#1a232d] text-[#5e6a7a] hover:text-white transition-colors cursor-pointer"
+            className="icon-btn"
+            onClick={handleCopy}
             title={t('dashboard.copy_invite_link')}
           >
-            <CopyIcon size={14} />
+            <LinkIcon size={14} />
           </button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => onOpen(workspace.id)}
-            className="text-xs py-1.5 px-3 group-hover:bg-[#1ec8b5] group-hover:text-[#0a0e14] group-hover:border-none transition-all duration-300"
-          >
+          <span className="ws-open-btn">
             {t('dashboard.open')}
-          </Button>
+            <ArrowRightTailIcon size={11} />
+          </span>
         </div>
       </div>
     </div>
   );
 };
+

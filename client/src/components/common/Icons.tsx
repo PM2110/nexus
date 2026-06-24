@@ -159,3 +159,33 @@ export const BellIcon: React.FC<IconProps> = ({ size = 16, className = '', ...pr
   </svg>
 );
 
+export const JoinIcon: React.FC<IconProps> = ({ size = 16, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+  </svg>
+);
+
+export const LinkIcon: React.FC<IconProps> = ({ size = 16, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+  </svg>
+);
+
+export const ShareIcon: React.FC<IconProps> = ({ size = 16, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <path d="M8.684 10.742l-2.084 1.1c-.244.131-.564.086-.757-.109a1.394 1.394 0 010-1.97l2.084-1.1m4.842 4.148l-2.084-1.1m4.842 1.1a1.4 1.4 0 010 1.97l-2.084 1.1m-4.842-4.148l2.084 1.1m4.842-1.1a1.4 1.4 0 000-1.97l-2.084-1.1M13.828 10.172a4 4 0 00-5.656 0" />
+  </svg>
+);
+
+export const ArrowRightTailIcon: React.FC<IconProps> = ({ size = 11, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <path d="M3 8h10M9 4l4 4-4 4" />
+  </svg>
+);
+
+export const TerminalWindowIcon: React.FC<IconProps> = ({ size = 16, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <path d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  </svg>
+);
+
