@@ -2,10 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
 import { Button } from '../components/common/Button';
+import { useAuth } from '../context/AuthContext';
 
 export const HomeHero: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   return (
     <header className="hero-header">
@@ -33,7 +35,7 @@ export const HomeHero: React.FC = () => {
           <Button
             variant="primary"
             size="lg"
-            onClick={() => navigate('/login')}
+            onClick={() => navigate(isAuthenticated ? '/dashboard' : '/login')}
             icon={
               <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none">
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

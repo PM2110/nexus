@@ -14,6 +14,13 @@ export const Home: React.FC = () => {
   const [scrollY, setScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState<string>('');
 
+  // Redirect to dashboard if logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
   // Monitor scroll for nav styling and background parallax layers
   useEffect(() => {
     const handleScroll = () => {
@@ -115,6 +122,14 @@ export const Home: React.FC = () => {
             </a>
             {isAuthenticated ? (
               <div className="flex items-center gap-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/dashboard')}
+                  className="text-xs py-1.5 px-3 border-[#1ec8b5]/20 text-[#1ec8b5] hover:bg-[#1ec8b5]/5 hover:border-[#1ec8b5]"
+                >
+                  Dashboard
+                </Button>
                 <div className="flex items-center gap-2.5">
                   {user?.avatar ? (
                     <img

@@ -3,6 +3,8 @@ import 'dotenv/config';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import authRouter from './routes/auth.routes';
+import workspaceRouter from './routes/workspace.routes';
+import friendRouter from './routes/friend.routes';
 import { initDb } from './config/db';
 import { config } from './config/env';
 
@@ -31,6 +33,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // API Routes
 app.use('/api/auth', authRouter);
+app.use('/api/workspaces', workspaceRouter);
+app.use('/api/friends', friendRouter);
 
 // Health Check
 app.get('/api/health', (req: Request, res: Response) => {
