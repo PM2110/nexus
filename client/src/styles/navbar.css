@@ -178,6 +178,23 @@ nav.app-nav {
   background: var(--danger);
 }
 
+.nav-link.nav-link-active {
+  color: var(--teal);
+}
+
+.nav-link.nav-link-active::after {
+  width: 100%;
+}
+
+.nav-link.danger.nav-link-active {
+  color: var(--danger);
+}
+
+.nav-link.danger.nav-link-active::after {
+  background: var(--danger);
+  width: 100%;
+}
+
 .nav-avatar {
   width: 38px;
   height: 38px;

@@ -27,6 +27,7 @@
   justify-content: space-between;
   gap: 20px;
   flex-wrap: wrap;
+  margin-top: 40px;
   margin-bottom: 36px;
 }
 
@@ -952,4 +953,24 @@
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: 1px;
+}
+
+/* Two-column Friends Layout */
+.friends-bottom-grid {
+  display: grid;
+  grid-template-columns: 1.8fr 1.2fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .friends-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.friends-scroll-container {
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 8px;
 }

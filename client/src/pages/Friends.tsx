@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { friendService } from '../services';
 import { SearchInput } from '../components/common/SearchInput';
 import { InfiniteScroll } from '../components/common/InfiniteScroll';
@@ -11,10 +10,6 @@ import { FriendRequestItem } from '../components/dashboard/FriendRequestItem';
 import '../styles/dashboard.css';
 
 export const Friends: React.FC = () => {
-  const { user } = useAuth();
-
-  // User identity tag copied state
-  const [copied, setCopied] = useState(false);
 
   // Add friend state
   const [targetUsername, setTargetUsername] = useState('');
@@ -81,14 +76,6 @@ export const Friends: React.FC = () => {
     return () => window.removeEventListener('friend-updated', handleUpdate);
   }, [fetchFriends, fetchFriendRequests]);
 
-  const handleCopyUsername = () => {
-    if (user?.username) {
-      navigator.clipboard.writeText(user.username);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
   const handleAddFriend = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddError(null);
@@ -150,13 +137,6 @@ export const Friends: React.FC = () => {
       {/* Navigation */}
       <Navbar />
 
-      {/* Friends Header */}
-      <div className="wrap dash-header">
-        <div className="dash-eyebrow rise" style={{ animationDelay: '.05s' }}>
-          <span className="glow-dot" /> CONNECTIVITY ACTIVE
-        </div>
-      </div>
-
       {/* Main Layout Grid */}
       <main className="wrap pb-20 rise" style={{ animationDelay: '.1s' }}>
         <div className="dash-title-row">
@@ -166,95 +146,45 @@ export const Friends: React.FC = () => {
           </div>
         </div>
 
-        <div className="friends-grid">
-          {/* LEFT SIDEBAR: PROFILE CARD & ADD FRIEND FORM */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {/* My Identity Card */}
-            <div className="side-panel">
-              <div className="side-panel-title">
-                <span className="glow-dot" /> Your Identity Code
-              </div>
-              <div className="identity-card-inner">
-                <div className="identity-avatar">
-                  {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) : 'U'}
-                </div>
-                <div className="identity-info">
-                  <div className="identity-name">{user?.name}</div>
-                  <div className="identity-email">{user?.email}</div>
-                </div>
-                {user?.username && (
-                  <div className="share-tag-container">
-                    <div className="share-tag-label">SHARE YOUR TAG</div>
-                    <div className="share-tag-box">
-                      <span className="share-tag-text">{user.username}</span>
-                      <button onClick={handleCopyUsername} className="copy-tag-btn">
-                        {copied ? 'Copied!' : 'Copy'}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Add Friend Box */}
-            <div className="side-panel">
-              <div className="side-panel-title">Add a Friend</div>
-              <p className="add-friend-desc" style={{ marginBottom: '12px' }}>
-                Type in the full name and tag to send a request.
-              </p>
-              <form onSubmit={handleAddFriend} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <input
-                  type="text"
-                  placeholder="e.g. mananpatel#4009"
-                  value={targetUsername}
-                  onChange={(e) => setTargetUsername(e.target.value)}
-                  className="field-input font-mono"
-                  disabled={isSubmitting}
-                />
-                <button
-                  type="submit"
-                  disabled={isSubmitting || !targetUsername.trim()}
-                  className="btn btn-primary"
-                  style={{ justifyContent: 'center', width: '100%' }}
-                >
-                  {isSubmitting ? 'Sending...' : 'Send Friend Request'}
-                </button>
-              </form>
-              {addError && <div className="form-error" style={{ marginTop: '10px' }}>{addError}</div>}
-              {addSuccess && <div className="form-success" style={{ marginTop: '10px' }}>{addSuccess}</div>}
-            </div>
-
-            {/* Pending Requests Box */}
-            <div className="side-panel">
-              <div className="side-panel-title">
-                {friendRequests.length > 0 && <span className="glow-dot danger" />}
-                Pending Requests ({friendRequests.length})
-              </div>
-              {isLoadingRequests ? (
-                <div className="text-center py-4">
-                  <SpinnerIcon size={18} className="animate-spin text-[#1ec8b5] mx-auto" />
-                </div>
-              ) : friendRequests.length === 0 ? (
-                <p className="text-xs text-[#5e6a7a] text-center italic py-2">No pending invitations</p>
-              ) : (
-                <div className="flex flex-col gap-2.5 max-h-60 overflow-y-auto pr-1">
-                  {friendRequests.map((req) => (
-                    <FriendRequestItem
-                      key={req.friendshipId}
-                      request={req}
-                      onAccept={handleAcceptRequest}
-                      onReject={handleRejectRequest}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
+        {/* TOP SECTION: ADD A NEW FRIEND (FULL WIDTH) */}
+        <div className="side-panel" style={{ marginBottom: '24px' }}>
+          <div className="side-panel-title">Add a Friend</div>
+          <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '20px', alignItems: 'center', justifyContent: 'space-between' }}>
+            <p className="add-friend-desc" style={{ marginBottom: 0, flex: '1 1 300px', fontSize: '0.78rem', color: 'var(--text-dim)', lineHeight: '1.5' }}>
+              You can add friends with their unique user tag. Type in their name and tag (e.g. <code>username#1234</code>) to send a friend request.
+            </p>
+            <form onSubmit={handleAddFriend} style={{ display: 'flex', gap: '12px', flex: '1 1 400px', maxWidth: '600px' }}>
+              <input
+                type="text"
+                placeholder="e.g. mananpatel#4009"
+                value={targetUsername}
+                onChange={(e) => setTargetUsername(e.target.value)}
+                className="field-input font-mono"
+                style={{ flex: 1, marginBottom: 0 }}
+                disabled={isSubmitting}
+              />
+              <button
+                type="submit"
+                disabled={isSubmitting || !targetUsername.trim()}
+                className="btn btn-primary"
+                style={{ flexShrink: 0, padding: '0 24px', height: '42px', justifyContent: 'center' }}
+              >
+                {isSubmitting ? 'Sending...' : 'Send Request'}
+              </button>
+            </form>
           </div>
+          {addError && <div className="form-error" style={{ marginTop: '12px' }}>{addError}</div>}
+          {addSuccess && <div className="form-success" style={{ marginTop: '12px' }}>{addSuccess}</div>}
+        </div>
 
-          {/* RIGHT CONTENT AREA: FRIENDS DIRECTORY */}
+        {/* BOTTOM SECTION: SIDE-BY-SIDE 2 COLUMNS */}
+        <div className="friends-bottom-grid">
+          {/* COLUMN 1: ACTIVE CONNECTIONS WITH SCROLLBAR */}
           <div className="side-panel" style={{ minHeight: '400px', marginBottom: 0 }}>
             <div className="friends-header-row">
-              <div className="side-panel-title" style={{ fontSize: '0.98rem' }}>Active Connections</div>
+              <div className="side-panel-title" style={{ fontSize: '0.98rem' }}>
+                Active Connections ({friends.length})
+              </div>
               <div style={{ width: '250px' }}>
                 <SearchInput
                   placeholder="Search by name..."
@@ -287,11 +217,12 @@ export const Friends: React.FC = () => {
                 </p>
               </div>
             ) : (
-              <div className="friends-list-grid">
+              <div className="friends-scroll-container">
                 <InfiniteScroll
                   loadMore={loadMoreFriends}
                   hasMore={hasMoreFriends}
                   isLoading={isLoadingFriends}
+                  className="friends-list-grid"
                   loader={<div className="text-center py-2 text-xs text-[#5e6a7a] col-span-full">Loading more...</div>}
                 >
                   {friends.map((f) => (
@@ -311,6 +242,32 @@ export const Friends: React.FC = () => {
                     </div>
                   ))}
                 </InfiniteScroll>
+              </div>
+            )}
+          </div>
+
+          {/* COLUMN 2: PENDING REQUESTS */}
+          <div className="side-panel" style={{ marginBottom: 0 }}>
+            <div className="side-panel-title">
+              {friendRequests.length > 0 && <span className="glow-dot danger" />}
+              Pending Requests ({friendRequests.length})
+            </div>
+            {isLoadingRequests ? (
+              <div className="text-center py-4">
+                <SpinnerIcon size={18} className="animate-spin text-[#1ec8b5] mx-auto" />
+              </div>
+            ) : friendRequests.length === 0 ? (
+              <p className="text-xs text-[#5e6a7a] text-center italic py-2">No pending invitations</p>
+            ) : (
+              <div className="flex flex-col gap-2.5 max-h-[480px] overflow-y-auto pr-1">
+                {friendRequests.map((req) => (
+                  <FriendRequestItem
+                    key={req.friendshipId}
+                    request={req}
+                    onAccept={handleAcceptRequest}
+                    onReject={handleRejectRequest}
+                  />
+                ))}
               </div>
             )}
           </div>

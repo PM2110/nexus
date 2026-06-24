@@ -160,13 +160,6 @@ export const Dashboard: React.FC = () => {
       {/* Navigation */}
       <Navbar />
 
-      {/* Dashboard Header */}
-      <div className="wrap dash-header">
-        <div className="dash-eyebrow rise" style={{ animationDelay: '.05s' }}>
-          <span className="glow-dot" /> SESSION ACTIVE
-        </div>
-      </div>
-
       {/* Main Content */}
       <main className="wrap pb-20 rise" style={{ animationDelay: '.1s' }}>
         <div className="dash-title-row">

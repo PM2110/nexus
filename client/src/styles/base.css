@@ -51,7 +51,6 @@
   background-color: var(--void);
   font-family: var(--font-sans);
   position: relative;
-  overflow-x: hidden;
 }
 
 .page-wrapper::selection,
