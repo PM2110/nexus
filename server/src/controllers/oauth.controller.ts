@@ -31,6 +31,25 @@ const saveRefreshToken = async (userId: number, token: string) => {
   });
 };
 
+const generateUniqueUsername = async (name: string): Promise<string> => {
+  const base = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  let username = '';
+  let exists = true;
+  let attempts = 0;
+  while (exists && attempts < 100) {
+    const code = Math.floor(1000 + Math.random() * 9000);
+    username = `${base}#${code}`;
+    const user = await prisma.user.findUnique({
+      where: { username },
+    });
+    if (!user) {
+      exists = false;
+    }
+    attempts++;
+  }
+  return username;
+};
+
 // ==========================================
 // GOOGLE OAUTH FLOW
 // ==========================================
@@ -102,10 +121,12 @@ export const googleCallback = async (req: Request, res: Response) => {
     });
 
     if (!user) {
+      const username = await generateUniqueUsername(userData.name);
       user = await prisma.user.create({
         data: {
           name: userData.name,
           email: userData.email.toLowerCase(),
+          username,
           provider: 'google',
           providerId: userData.id,
           avatar: userData.picture,
@@ -133,6 +154,7 @@ export const googleCallback = async (req: Request, res: Response) => {
         id: String(user.id),
         name: user.name,
         email: user.email,
+        username: user.username,
         role: user.role,
         avatar: user.avatar,
       })
@@ -242,10 +264,12 @@ export const githubCallback = async (req: Request, res: Response) => {
     });
 
     if (!user) {
+      const username = await generateUniqueUsername(userData.name);
       user = await prisma.user.create({
         data: {
           name: userData.name,
           email: userData.email.toLowerCase(),
+          username,
           provider: 'github',
           providerId: userData.id,
           avatar: userData.picture,
@@ -273,6 +297,7 @@ export const githubCallback = async (req: Request, res: Response) => {
         id: String(user.id),
         name: user.name,
         email: user.email,
+        username: user.username,
         role: user.role,
         avatar: user.avatar,
       })

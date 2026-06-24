@@ -1,26 +1,128 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../hooks/useTranslation';
 import { Button } from './Button';
 import { BrandIcon } from './Icons';
+import { notificationService, friendService } from '../../services';
+import type { Notification } from '../../services/notificationService';
 import '../../styles/navbar.css';
 
 interface NavbarProps {
   activeSection?: string;
   onNavClick?: (e: React.MouseEvent<HTMLAnchorElement>, id: string) => void;
-  scrollToSection?: (id: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeSection,
   onNavClick,
-  scrollToSection,
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
+
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  const fetchNotifications = async () => {
+    try {
+      const data = await notificationService.getNotifications();
+      setNotifications(data.notifications);
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setIsNotifOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      fetchNotifications();
+    };
+    window.addEventListener('friend-updated', handleUpdate);
+    window.addEventListener('notifications-updated', handleUpdate);
+    return () => {
+      window.removeEventListener('friend-updated', handleUpdate);
+      window.removeEventListener('notifications-updated', handleUpdate);
+    };
+  }, []);
+
+  const handleMarkRead = async (id: number) => {
+    try {
+      await notificationService.markAsRead(id);
+      fetchNotifications();
+    } catch (err) {
+      console.error('Failed to mark read:', err);
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await notificationService.markAllAsRead();
+      fetchNotifications();
+    } catch (err) {
+      console.error('Failed to mark all read:', err);
+    }
+  };
+
+  const handleDeleteNotification = async (id: number) => {
+    try {
+      await notificationService.deleteNotification(id);
+      fetchNotifications();
+    } catch (err) {
+      console.error('Failed to delete notification:', err);
+    }
+  };
+
+  const handleAcceptFriendBySenderName = async (senderName: string, notificationId: number) => {
+    try {
+      const data = await friendService.getFriendRequests();
+      const match = data.requests.find((r) => r.sender.name === senderName);
+      if (match) {
+        await friendService.acceptFriendRequest(match.friendshipId);
+      }
+      await notificationService.markAsRead(notificationId);
+      fetchNotifications();
+      window.dispatchEvent(new CustomEvent('friend-updated'));
+    } catch (err: any) {
+      alert(err.message || 'Failed to accept friend request');
+    }
+  };
+
+  const handleRejectFriendBySenderName = async (senderName: string, notificationId: number) => {
+    try {
+      const data = await friendService.getFriendRequests();
+      const match = data.requests.find((r) => r.sender.name === senderName);
+      if (match) {
+        await friendService.rejectFriendRequest(match.friendshipId);
+      }
+      await notificationService.markAsRead(notificationId);
+      fetchNotifications();
+      window.dispatchEvent(new CustomEvent('friend-updated'));
+    } catch (err: any) {
+      alert(err.message || 'Failed to decline friend request');
+    }
+  };
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -34,18 +136,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const isHomePage = location.pathname === '/';
 
-  const handleScrollToSection = (id: string) => {
-    if (scrollToSection) {
-      scrollToSection(id);
-    } else {
-      navigate('/dashboard');
-      setTimeout(() => {
-        const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
-  };
-
   const handleBrandClick = () => {
     if (isHomePage) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -58,7 +148,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     ? `nav-bar ${isScrolled ? 'nav-bar-scrolled' : 'nav-bar-transparent'}`
     : 'app-nav';
 
-  const containerClassName = isHomePage ? 'nav-container' : 'wrap-xl nav-inner';
+  const containerClassName = 'wrap nav-inner';
 
   return (
     <nav className={navClassName}>
@@ -107,14 +197,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               ) : (
                 <>
                   <button
-                    onClick={() => handleScrollToSection('workspaces-section')}
-                    className="nav-link"
+                    onClick={() => navigate('/dashboard')}
+                    className={`nav-link ${location.pathname === '/dashboard' ? 'nav-link-active' : 'nav-link-inactive'}`}
                   >
                     {t('dashboard.nav_workspaces')}
                   </button>
                   <button
-                    onClick={() => handleScrollToSection('friends-section')}
-                    className="nav-link"
+                    onClick={() => navigate('/friends')}
+                    className={`nav-link ${location.pathname === '/friends' ? 'nav-link-active' : 'nav-link-inactive'}`}
                   >
                     {t('dashboard.nav_friends')}
                   </button>
@@ -122,6 +212,107 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
 
               <div className="flex items-center gap-4">
+                {/* Notifications Dropdown */}
+                <div className="relative flex items-center" ref={notifRef}>
+                  <button
+                    onClick={() => setIsNotifOpen(!isNotifOpen)}
+                    className="relative p-1.5 rounded-lg text-[#9aa5b3] hover:text-white hover:bg-[#131a24] border border-[#222b38] transition-all cursor-pointer flex items-center justify-center"
+                    style={{ background: 'none' }}
+                  >
+                    <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-[#e0596b] text-white text-[8.5px] font-bold rounded-full flex items-center justify-center">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {isNotifOpen && (
+                    <div className="absolute right-0 top-full mt-2.5 w-80 bg-[#0d1219] border border-[#222b38] rounded-xl shadow-2xl z-50 overflow-hidden">
+                      <div className="px-4 py-3 border-b border-[#222b38] flex items-center justify-between">
+                        <span className="text-[11px] font-semibold text-white font-mono uppercase tracking-wider">Notifications</span>
+                        {unreadCount > 0 && (
+                          <button
+                            onClick={handleMarkAllRead}
+                            className="text-[10px] text-[#1ec8b5] hover:underline font-mono bg-transparent border-none cursor-pointer"
+                          >
+                            Mark all read
+                          </button>
+                        )}
+                      </div>
+                      <div className="max-h-72 overflow-y-auto divide-y divide-[#222b38]/40">
+                        {notifications.length === 0 ? (
+                          <div className="p-6 text-center text-[#5e6a7a] text-xs italic">
+                            No notifications
+                          </div>
+                        ) : (
+                          notifications.map((notif) => {
+                            const senderName = notif.content.split(' sent you a friend request')[0];
+                            return (
+                              <div key={notif.id} className={`p-3 text-left hover:bg-[#131a24]/50 transition-colors ${!notif.isRead ? 'bg-[#131a24]/30' : ''}`}>
+                                <div className="flex justify-between items-start gap-2">
+                                  <span className="text-[11px] font-semibold text-white">{notif.title}</span>
+                                  <div className="flex items-center gap-1.5">
+                                    {!notif.isRead && (
+                                      <button
+                                        onClick={() => handleMarkRead(notif.id)}
+                                        className="w-1.5 h-1.5 bg-[#1ec8b5] rounded-full hover:scale-125 transition-transform border-none cursor-pointer p-0"
+                                        title="Mark as read"
+                                      />
+                                    )}
+                                    <button
+                                      onClick={() => handleDeleteNotification(notif.id)}
+                                      className="text-[#5e6a7a] hover:text-[#e0596b] text-[13px] bg-transparent border-none cursor-pointer font-bold leading-none p-0"
+                                      title="Dismiss"
+                                    >
+                                      &times;
+                                    </button>
+                                  </div>
+                                </div>
+                                <p className="text-[11px] text-[#9aa5b3] mt-1 leading-relaxed">{notif.content}</p>
+                                
+                                {notif.type === 'FRIEND_REQUEST' && !notif.isRead && (
+                                  <div className="flex gap-2 mt-2">
+                                    <button
+                                      onClick={() => handleAcceptFriendBySenderName(senderName, notif.id)}
+                                      className="px-2.5 py-1 bg-[#1ec8b5] text-[#0a0e14] text-[9.5px] font-bold rounded hover:bg-[#28d6c2] transition-colors border-none cursor-pointer"
+                                    >
+                                      Accept
+                                    </button>
+                                    <button
+                                      onClick={() => handleRejectFriendBySenderName(senderName, notif.id)}
+                                      className="px-2.5 py-1 bg-[#e0596b]/10 text-[#e0596b] border border-[#e0596b]/20 text-[9.5px] font-bold rounded hover:bg-[#e0596b]/20 transition-colors cursor-pointer"
+                                    >
+                                      Decline
+                                    </button>
+                                  </div>
+                                )}
+
+                                {notif.type === 'WORKSPACE_INVITE' && notif.link && (
+                                  <div className="mt-2">
+                                    <button
+                                      onClick={() => {
+                                        handleMarkRead(notif.id);
+                                        setIsNotifOpen(false);
+                                        navigate(notif.link!);
+                                      }}
+                                      className="px-2.5 py-1 bg-[#1ec8b5]/10 text-[#1ec8b5] border border-[#1ec8b5]/25 text-[9.5px] font-bold rounded hover:bg-[#1ec8b5]/20 transition-colors cursor-pointer"
+                                    >
+                                      Join Workspace
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex items-center gap-2.5">
                   {user?.avatar ? (
                     <img

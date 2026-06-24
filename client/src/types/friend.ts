@@ -3,6 +3,7 @@ export interface Friend {
   id: string;
   name: string;
   email: string;
+  username?: string;
   avatar?: string;
 }
 
@@ -12,6 +13,7 @@ export interface FriendRequest {
     id: string;
     name: string;
     email: string;
+    username?: string;
     avatar?: string;
   };
   createdAt: string;

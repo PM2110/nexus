@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
+import { Friends } from './pages/Friends';
 import { WorkspaceJoin } from './pages/WorkspaceJoin';
 import { WorkspaceDetail } from './pages/WorkspaceDetail';
 import './styles/base.css';
@@ -44,6 +45,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/friends"
+              element={
+                <ProtectedRoute>
+                  <Friends />
                 </ProtectedRoute>
               }
             />

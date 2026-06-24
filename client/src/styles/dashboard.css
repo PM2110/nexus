@@ -86,8 +86,8 @@
 /* workspace cards */
 .ws-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 18px;
 }
 
 @media (max-width: 700px) {
@@ -747,4 +747,209 @@
 .link-copy-btn svg {
   width: 12px;
   height: 12px;
+}
+
+/* ---------- FRIENDS MODULE ---------- */
+.friends-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .friends-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.friends-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.identity-card-inner {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.identity-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--void);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--teal);
+}
+
+.identity-info {
+  text-align: center;
+}
+
+.identity-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.identity-email {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 2px;
+}
+
+.share-tag-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.share-tag-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.share-tag-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--void);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.share-tag-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--teal);
+}
+
+.copy-tag-btn {
+  padding: 4px 8px;
+  background: rgba(30, 200, 181, 0.08);
+  color: var(--teal);
+  border: 1px solid rgba(30, 200, 181, 0.22);
+  border-radius: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.64rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+}
+
+.copy-tag-btn:hover {
+  background: var(--teal);
+  color: var(--void);
+  border-color: transparent;
+}
+
+.form-error {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--danger);
+  background: rgba(224, 89, 107, 0.08);
+  border: 1px solid rgba(224, 89, 107, 0.22);
+  padding: 10px;
+  border-radius: 8px;
+  line-height: 1.4;
+}
+
+.form-success {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--teal);
+  background: rgba(30, 200, 181, 0.08);
+  border: 1px solid rgba(30, 200, 181, 0.22);
+  padding: 10px;
+  border-radius: 8px;
+  line-height: 1.4;
+}
+
+.friends-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--line-soft);
+  padding-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.friends-active-card {
+  padding: 12px;
+  background: rgba(19, 26, 36, 0.25);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all .25s var(--ease);
+}
+
+.friends-active-card:hover {
+  background: var(--raised);
+  border-color: rgba(30, 200, 181, 0.2);
+}
+
+.friend-card-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--raised-2);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--teal);
+}
+
+.friend-card-info {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.friend-card-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.friend-card-email {
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
 }

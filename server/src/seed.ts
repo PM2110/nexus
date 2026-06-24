@@ -20,8 +20,43 @@ const mockUsersData = [
   { name: 'Olivia Lewis', email: 'olivia@example.com' },
 ];
 
+const generateUniqueUsername = async (name: string): Promise<string> => {
+  const base = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  let username = '';
+  let exists = true;
+  let attempts = 0;
+  while (exists && attempts < 100) {
+    const code = Math.floor(1000 + Math.random() * 9000);
+    username = `${base}#${code}`;
+    const user = await prisma.user.findUnique({
+      where: { username },
+    });
+    if (!user) {
+      exists = false;
+    }
+    attempts++;
+  }
+  return username;
+};
+
 async function main() {
   console.log('Starting seed process...');
+
+  // Backfill existing users that have null username
+  const nullUsernameUsers = await prisma.user.findMany({
+    where: { username: null },
+  });
+  if (nullUsernameUsers.length > 0) {
+    console.log(`Backfilling usernames for ${nullUsernameUsers.length} existing user(s)...`);
+    for (const u of nullUsernameUsers) {
+      const generated = await generateUniqueUsername(u.name);
+      await prisma.user.update({
+        where: { id: u.id },
+        data: { username: generated },
+      });
+      console.log(`Backfilled username for ${u.name}: ${generated}`);
+    }
+  }
 
   const salt = await bcrypt.genSalt(10);
   const passwordHash = await bcrypt.hash('password123', salt);
@@ -35,17 +70,28 @@ async function main() {
     });
 
     if (!user) {
+      const username = await generateUniqueUsername(mock.name);
       user = await prisma.user.create({
         data: {
           name: mock.name,
           email: mock.email,
+          username,
           passwordHash,
           avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${mock.name.replace(' ', '')}`,
         },
       });
-      console.log(`Created mock user: ${user.name}`);
+      console.log(`Created mock user: ${user.name} (${user.username})`);
     } else {
-      console.log(`Mock user already exists: ${user.name}`);
+      if (!user.username) {
+        const username = await generateUniqueUsername(mock.name);
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { username },
+        });
+        console.log(`Updated mock user with username: ${user.name} (${user.username})`);
+      } else {
+        console.log(`Mock user already exists: ${user.name} (${user.username})`);
+      }
     }
     seededUsers.push(user);
   }

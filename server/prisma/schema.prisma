@@ -13,6 +13,7 @@ model User {
   id                   Int               @id @default(autoincrement())
   name                 String
   email                String            @unique
+  username             String?           @unique
   passwordHash         String?           @map("password_hash")
   role                 String            @default("Candidate")
   provider             String            @default("credentials")

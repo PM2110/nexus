@@ -20,12 +20,12 @@ export const friendService = {
     return response.data;
   },
 
-  sendFriendRequest: async (friendId: string) => {
+  sendFriendRequest: async (friendId?: string, username?: string) => {
     const response = await apiClient.post<{
       message: string;
       friendshipId: number;
       status: string;
-    }>('/friends/request', { friendId });
+    }>('/friends/request', { friendId, username });
     return response.data;
   },
 

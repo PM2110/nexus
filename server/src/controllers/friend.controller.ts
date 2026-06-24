@@ -47,10 +47,10 @@ export const getFriends = async (req: AuthRequest, res: Response) => {
         where: whereQuery,
         include: {
           user: {
-            select: { id: true, name: true, email: true, avatar: true },
+            select: { id: true, name: true, email: true, avatar: true, username: true },
           },
           friend: {
-            select: { id: true, name: true, email: true, avatar: true },
+            select: { id: true, name: true, email: true, avatar: true, username: true },
           },
         },
         skip,
@@ -67,6 +67,7 @@ export const getFriends = async (req: AuthRequest, res: Response) => {
         name: otherUser.name,
         email: otherUser.email,
         avatar: otherUser.avatar,
+        username: otherUser.username,
       };
     });
 
@@ -101,7 +102,7 @@ export const getFriendRequests = async (req: AuthRequest, res: Response) => {
       },
       include: {
         user: {
-          select: { id: true, name: true, email: true, avatar: true },
+          select: { id: true, name: true, email: true, avatar: true, username: true },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -114,6 +115,7 @@ export const getFriendRequests = async (req: AuthRequest, res: Response) => {
         name: r.user.name,
         email: r.user.email,
         avatar: r.user.avatar,
+        username: r.user.username,
       },
       createdAt: r.createdAt,
     }));
@@ -128,12 +130,24 @@ export const getFriendRequests = async (req: AuthRequest, res: Response) => {
 export const sendFriendRequest = async (req: AuthRequest, res: Response) => {
   try {
     const senderId = parseInt(req.user!.id, 10);
-    const { friendId } = req.body;
+    const { friendId, username } = req.body;
 
-    const targetFriendId = parseInt(friendId, 10);
+    let targetFriendId: number | null = null;
 
-    if (isNaN(senderId) || isNaN(targetFriendId)) {
-      return res.status(400).json({ message: 'Invalid sender or friend ID' });
+    if (username) {
+      const targetUser = await prisma.user.findUnique({
+        where: { username },
+      });
+      if (!targetUser) {
+        return res.status(404).json({ message: 'User not found with this username' });
+      }
+      targetFriendId = targetUser.id;
+    } else if (friendId) {
+      targetFriendId = parseInt(friendId, 10);
+    }
+
+    if (isNaN(senderId) || !targetFriendId || isNaN(targetFriendId)) {
+      return res.status(400).json({ message: 'Invalid sender, friend ID, or username' });
     }
 
     if (senderId === targetFriendId) {
