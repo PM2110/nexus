@@ -10,13 +10,25 @@ datasource db {
 }
 
 model User {
-  id                   Int     @id @default(autoincrement())
+  id                   Int            @id @default(autoincrement())
   name                 String
-  email                String  @unique
-  passwordHash         String  @map("password_hash")
-  role                 String  @default("Candidate")
-  resetPasswordToken   String? @map("reset_password_token")
-  resetPasswordExpires String? @map("reset_password_expires")
+  email                String         @unique
+  passwordHash         String         @map("password_hash")
+  role                 String         @default("Candidate")
+  resetPasswordToken   String?        @map("reset_password_token")
+  resetPasswordExpires String?        @map("reset_password_expires")
+  refreshTokens        RefreshToken[]
 
   @@map("users")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("refresh_tokens")
 }

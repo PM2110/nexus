@@ -9,27 +9,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Initialize Auth State from localStorage
+  // Initialize Auth State consistently from the correct storage source
   useEffect(() => {
-    const storedToken = localStorage.getItem('nexus_access_token') || sessionStorage.getItem('nexus_access_token');
-    const storedUser = localStorage.getItem('nexus_user') || sessionStorage.getItem('nexus_user');
+    const isLocal = !!localStorage.getItem('nexus_access_token');
+    const storage = isLocal ? localStorage : sessionStorage;
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
+    const storedAccessToken = storage.getItem('nexus_access_token');
+    const storedUser = storage.getItem('nexus_user');
+
+    if (storedAccessToken && storedUser) {
+      setToken(storedAccessToken);
       setUser(JSON.parse(storedUser));
     }
     setIsLoading(false);
+  }, []);
+
+  // Listen for global logout events triggered by axios interceptor
+  useEffect(() => {
+    const handleAuthLogout = () => {
+      setToken(null);
+      setUser(null);
+    };
+    window.addEventListener('auth_logout', handleAuthLogout);
+    return () => window.removeEventListener('auth_logout', handleAuthLogout);
   }, []);
 
   const login = async (email: string, password: string, remember: boolean) => {
     try {
       const data = await authService.login(email, password);
 
-      setToken(data.token);
+      setToken(data.accessToken);
       setUser(data.user);
 
       const storage = remember ? localStorage : sessionStorage;
-      storage.setItem('nexus_access_token', data.token);
+      storage.setItem('nexus_access_token', data.accessToken);
+      storage.setItem('nexus_refresh_token', data.refreshToken);
       storage.setItem('nexus_user', JSON.stringify(data.user));
 
       return { success: true, message: data.message || 'Logged in successfully' };
@@ -42,11 +56,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const data = await authService.signup(name, email, password, role);
 
-      setToken(data.token);
+      setToken(data.accessToken);
       setUser(data.user);
 
       // Default to session storage on register, can be changed
-      sessionStorage.setItem('nexus_access_token', data.token);
+      sessionStorage.setItem('nexus_access_token', data.accessToken);
+      sessionStorage.setItem('nexus_refresh_token', data.refreshToken);
       sessionStorage.setItem('nexus_user', JSON.stringify(data.user));
 
       return { success: true, message: data.message || 'Signed up successfully' };
@@ -80,11 +95,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    const refreshToken = localStorage.getItem('nexus_refresh_token') || sessionStorage.getItem('nexus_refresh_token');
+    
+    // Revoke refresh token on backend asynchronously (fire-and-forget for instant UI update)
+    if (refreshToken) {
+      authService.logout(refreshToken).catch((err) => {
+        console.error('Error revoking token on server:', err);
+      });
+    }
+
     setToken(null);
     setUser(null);
     localStorage.removeItem('nexus_access_token');
+    localStorage.removeItem('nexus_refresh_token');
     localStorage.removeItem('nexus_user');
     sessionStorage.removeItem('nexus_access_token');
+    sessionStorage.removeItem('nexus_refresh_token');
     sessionStorage.removeItem('nexus_user');
   };
 

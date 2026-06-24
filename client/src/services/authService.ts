@@ -3,7 +3,8 @@ import type { User } from '../types';
 
 export interface AuthResponse {
   message: string;
-  token: string;
+  accessToken: string;
+  refreshToken: string;
   user: User;
 }
 
@@ -19,6 +20,11 @@ export interface ResetPasswordResponse {
 
 export interface GetMeResponse {
   user: User;
+}
+
+export interface RefreshResponse {
+  accessToken: string;
+  refreshToken: string;
 }
 
 export const authService = {
@@ -54,6 +60,19 @@ export const authService = {
       password,
     });
     return response.data;
+  },
+
+  async refresh(refreshToken: string): Promise<RefreshResponse> {
+    const response = await apiClient.post<RefreshResponse>('/auth/refresh', {
+      refreshToken,
+    });
+    return response.data;
+  },
+
+  async logout(refreshToken: string | null): Promise<void> {
+    if (refreshToken) {
+      await apiClient.post('/auth/logout', { refreshToken });
+    }
   },
 
   async getMe(): Promise<GetMeResponse> {

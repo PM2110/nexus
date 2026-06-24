@@ -9,13 +9,41 @@ if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is not defined.');
 }
 
-// Helper to generate JWT token
-const generateToken = (user: { id: string | number; email: string; role: string }): string => {
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+if (!JWT_REFRESH_SECRET) {
+  throw new Error('JWT_REFRESH_SECRET environment variable is not defined.');
+}
+
+// Helper to generate 1-hour access token
+const generateAccessToken = (user: { id: string | number; email: string; role: string }): string => {
   return jwt.sign(
     { id: String(user.id), email: user.email, role: user.role },
     JWT_SECRET,
+    { expiresIn: '1h' }
+  );
+};
+
+// Helper to generate 7-day refresh token
+const generateRefreshToken = (user: { id: string | number; email: string; role: string }): string => {
+  return jwt.sign(
+    { id: String(user.id), email: user.email, role: user.role },
+    JWT_REFRESH_SECRET,
     { expiresIn: '7d' }
   );
+};
+
+// Helper to store refresh token in database
+const saveRefreshToken = async (userId: number, token: string) => {
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
+
+  await prisma.refreshToken.create({
+    data: {
+      token,
+      userId,
+      expiresAt,
+    },
+  });
 };
 
 export const signup = async (req: Request, res: Response) => {
@@ -47,11 +75,14 @@ export const signup = async (req: Request, res: Response) => {
       },
     });
 
-    const token = generateToken(newUser);
+    const accessToken = generateAccessToken(newUser);
+    const refreshToken = generateRefreshToken(newUser);
+    await saveRefreshToken(newUser.id, refreshToken);
 
     return res.status(201).json({
       message: 'Account created successfully',
-      token,
+      accessToken,
+      refreshToken,
       user: {
         id: String(newUser.id),
         name: newUser.name,
@@ -85,11 +116,14 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    const token = generateToken(user);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+    await saveRefreshToken(user.id, refreshToken);
 
     return res.json({
       message: 'Logged in successfully',
-      token,
+      accessToken,
+      refreshToken,
       user: {
         id: String(user.id),
         name: user.name,
@@ -182,6 +216,74 @@ export const resetPassword = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Reset password error:', error);
     return res.status(500).json({ message: 'Server error during password reset' });
+  }
+};
+
+export const refresh = async (req: Request, res: Response) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({ message: 'Refresh token is required' });
+    }
+
+    // Verify token signature
+    let decoded: any;
+    try {
+      decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+    } catch (err) {
+      return res.status(401).json({ message: 'Invalid or expired refresh token' });
+    }
+
+    // Find token in database
+    const dbToken = await prisma.refreshToken.findUnique({
+      where: { token: refreshToken },
+      include: { user: true },
+    });
+
+    if (!dbToken) {
+      return res.status(401).json({ message: 'Refresh token not found or revoked' });
+    }
+
+    // Check expiration
+    if (dbToken.expiresAt < new Date()) {
+      await prisma.refreshToken.delete({ where: { token: refreshToken } });
+      return res.status(401).json({ message: 'Refresh token expired' });
+    }
+
+    // Generate new tokens (rotation)
+    const user = dbToken.user;
+    const newAccessToken = generateAccessToken(user);
+    const newRefreshToken = generateRefreshToken(user);
+
+    // Delete old refresh token, save new one
+    await prisma.refreshToken.delete({ where: { token: refreshToken } });
+    await saveRefreshToken(user.id, newRefreshToken);
+
+    return res.json({
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    });
+  } catch (error) {
+    console.error('Refresh token error:', error);
+    return res.status(500).json({ message: 'Server error during token refresh' });
+  }
+};
+
+export const logout = async (req: Request, res: Response) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (refreshToken) {
+      await prisma.refreshToken.deleteMany({
+        where: { token: refreshToken },
+      });
+    }
+
+    return res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    return res.status(500).json({ message: 'Server error during logout' });
   }
 };
 
