@@ -4,22 +4,14 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '../config/db';
 import { AuthRequest } from '../types';
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is not defined.');
-}
-
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
-if (!JWT_REFRESH_SECRET) {
-  throw new Error('JWT_REFRESH_SECRET environment variable is not defined.');
-}
+import { config } from '../config/env';
 
 // Helper to generate 1-hour access token
 const generateAccessToken = (user: { id: string | number; email: string; role: string }): string => {
   return jwt.sign(
     { id: String(user.id), email: user.email, role: user.role },
-    JWT_SECRET,
-    { expiresIn: '1h' }
+    config.JWT_SECRET,
+    { expiresIn: config.JWT_ACCESS_EXPIRES_IN }
   );
 };
 
@@ -27,15 +19,14 @@ const generateAccessToken = (user: { id: string | number; email: string; role: s
 const generateRefreshToken = (user: { id: string | number; email: string; role: string }): string => {
   return jwt.sign(
     { id: String(user.id), email: user.email, role: user.role },
-    JWT_REFRESH_SECRET,
-    { expiresIn: '7d' }
+    config.JWT_REFRESH_SECRET,
+    { expiresIn: config.JWT_REFRESH_EXPIRES_IN }
   );
 };
 
 // Helper to store refresh token in database
 const saveRefreshToken = async (userId: number, token: string) => {
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
+  const expiresAt = new Date(Date.now() + config.JWT_REFRESH_EXPIRES_IN * 1000);
 
   await prisma.refreshToken.create({
     data: {
@@ -109,6 +100,10 @@ export const login = async (req: Request, res: Response) => {
     });
     if (!user) {
       return res.status(400).json({ message: 'Invalid email or password' });
+    }
+
+    if (!user.passwordHash) {
+      return res.status(400).json({ message: 'This account was registered using a social provider (Google or GitHub). Please sign in using that option.' });
     }
 
     const isMatch = await bcrypt.compare(password, user.passwordHash);
@@ -230,7 +225,7 @@ export const refresh = async (req: Request, res: Response) => {
     // Verify token signature
     let decoded: any;
     try {
-      decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+      decoded = jwt.verify(refreshToken, config.JWT_REFRESH_SECRET);
     } catch (err) {
       return res.status(401).json({ message: 'Invalid or expired refresh token' });
     }

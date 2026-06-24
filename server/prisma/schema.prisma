@@ -13,8 +13,11 @@ model User {
   id                   Int            @id @default(autoincrement())
   name                 String
   email                String         @unique
-  passwordHash         String         @map("password_hash")
+  passwordHash         String?        @map("password_hash")
   role                 String         @default("Candidate")
+  provider             String         @default("credentials")
+  providerId           String?        @map("provider_id")
+  avatar               String?
   resetPasswordToken   String?        @map("reset_password_token")
   resetPasswordExpires String?        @map("reset_password_expires")
   refreshTokens        RefreshToken[]

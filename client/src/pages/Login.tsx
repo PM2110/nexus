@@ -20,7 +20,7 @@ import {
 export const Login: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { login, signup, forgotPassword, resetPassword, isAuthenticated } = useAuth();
+  const { login, signup, forgotPassword, resetPassword, setSession, isAuthenticated } = useAuth();
 
   // Page states: 'login' | 'signup' | 'forgot' | 'reset'
   const [mode, setMode] = useState<'login' | 'signup' | 'forgot' | 'reset'>('login');
@@ -45,6 +45,32 @@ export const Login: React.FC = () => {
       navigate('/');
     }
   }, [isAuthenticated, navigate]);
+
+  // Handle URL redirect query parameters for Google and GitHub OAuth callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tokenParam = params.get('token');
+    const refreshTokenParam = params.get('refreshToken');
+    const userParam = params.get('user');
+    const errorParam = params.get('error');
+
+    if (errorParam) {
+      setError(
+        errorParam === 'google_auth_failed'
+          ? 'Google authentication failed. Please try again.'
+          : 'GitHub authentication failed. Please try again.'
+      );
+      navigate('/login', { replace: true });
+    } else if (tokenParam && refreshTokenParam && userParam) {
+      try {
+        const parsedUser = JSON.parse(decodeURIComponent(userParam));
+        setSession(tokenParam, refreshTokenParam, parsedUser, true);
+        navigate('/');
+      } catch (err) {
+        setError('Failed to process authentication details. Please try again.');
+      }
+    }
+  }, [navigate, setSession]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -281,11 +307,25 @@ export const Login: React.FC = () => {
             {(mode === 'login' || mode === 'signup') && (
               <>
                 <div className="auth-oauth-row">
-                  <Button variant="outline" className="flex-1 flex gap-2" type="button">
+                  <Button
+                    variant="outline"
+                    className="flex-1 flex gap-2"
+                    type="button"
+                    onClick={() => {
+                      window.location.href = 'http://localhost:4000/api/auth/google';
+                    }}
+                  >
                     <GoogleIcon size={16} />
                     Google
                   </Button>
-                  <Button variant="outline" className="flex-1 flex gap-2" type="button">
+                  <Button
+                    variant="outline"
+                    className="flex-1 flex gap-2"
+                    type="button"
+                    onClick={() => {
+                      window.location.href = 'http://localhost:4000/api/auth/github';
+                    }}
+                  >
                     <GitHubIcon size={16} />
                     GitHub
                   </Button>

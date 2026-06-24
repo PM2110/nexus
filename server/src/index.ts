@@ -4,14 +4,20 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import authRouter from './routes/auth.routes';
 import { initDb } from './config/db';
-
+import { config } from './config/env';
 
 const app = express();
-const port = process.env.PORT || 4000;
 
-// Security & Body Parsing Middlewares
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : '*',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like curl, backend to backend, or local tests)
+    if (!origin) return callback(null, true);
+    if (config.ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
   credentials: true,
 }));
 app.use(express.json());
@@ -49,8 +55,8 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 // Bootstrap server after database connection check
 initDb()
   .then(() => {
-    app.listen(port, () => {
-      console.log(`Nexus API Server is listening on port ${port}`);
+    app.listen(config.PORT, () => {
+      console.log(`Nexus API Server is listening on port ${config.PORT}`);
     });
   })
   .catch((err) => {

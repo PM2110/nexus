@@ -3,6 +3,7 @@ export interface User {
   name: string;
   email: string;
   role: string;
+  avatar?: string;
 }
 
 export interface AuthContextType {
@@ -14,5 +15,6 @@ export interface AuthContextType {
   signup: (name: string, email: string, password: string, role: string) => Promise<{ success: boolean; message: string }>;
   forgotPassword: (email: string) => Promise<{ success: boolean; message: string; token?: string }>;
   resetPassword: (email: string, token: string, password: string) => Promise<{ success: boolean; message: string }>;
+  setSession: (accessToken: string, refreshToken: string, userData: User, remember: boolean) => void;
   logout: () => void;
 }

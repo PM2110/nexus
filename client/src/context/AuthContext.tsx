@@ -94,6 +94,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const setSession = (accessToken: string, refreshToken: string, userData: User, remember: boolean = true) => {
+    setToken(accessToken);
+    setUser(userData);
+
+    const storage = remember ? localStorage : sessionStorage;
+    storage.setItem('nexus_access_token', accessToken);
+    storage.setItem('nexus_refresh_token', refreshToken);
+    storage.setItem('nexus_user', JSON.stringify(userData));
+  };
+
   const logout = () => {
     const refreshToken = localStorage.getItem('nexus_refresh_token') || sessionStorage.getItem('nexus_refresh_token');
     
@@ -125,6 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signup,
         forgotPassword,
         resetPassword,
+        setSession,
         logout,
       }}
     >

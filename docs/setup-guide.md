@@ -54,7 +54,7 @@ Navigate into the `client/` directory and run:
    ```bash
    npm run dev
    ```
-   The frontend application will boot at `http://localhost:5174` (or fallback to port `5173`).
+   The frontend application will boot at `http://localhost:3000`.
 
 ---
 
