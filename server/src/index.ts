@@ -1,11 +1,10 @@
+import 'dotenv/config';
+
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import authRouter from './routes/auth.routes';
 import { initDb } from './config/db';
 
-// Load environment variables
-dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 4000;
