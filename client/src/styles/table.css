@@ -1,0 +1,67 @@
+/* table.css */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  background-color: var(--surface);
+}
+
+.table-root {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--text);
+}
+
+.table-head {
+  background-color: var(--raised);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--line);
+}
+
+.table-th {
+  padding: 1rem 1.5rem;
+  font-weight: 500;
+}
+
+.table-body tr {
+  border-bottom: 1px solid rgba(34, 43, 56, 0.5);
+}
+
+.table-body tr:last-child {
+  border-bottom: none;
+}
+
+.table-td {
+  padding: 1rem 1.5rem;
+  white-space: nowrap;
+}
+
+.table-row {
+  transition: background-color 0.15s var(--ease);
+}
+
+.table-row-clickable {
+  cursor: pointer;
+}
+
+.table-row-clickable:hover {
+  background-color: rgba(39, 39, 42, 0.4);
+}
+
+.table-row-static:hover {
+  background-color: rgba(39, 39, 42, 0.2);
+}
+
+.table-td-empty {
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: var(--text-faint);
+  font-style: italic;
+}

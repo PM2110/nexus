@@ -10,17 +10,23 @@ datasource db {
 }
 
 model User {
-  id                   Int            @id @default(autoincrement())
+  id                   Int               @id @default(autoincrement())
   name                 String
-  email                String         @unique
-  passwordHash         String?        @map("password_hash")
-  role                 String         @default("Candidate")
-  provider             String         @default("credentials")
-  providerId           String?        @map("provider_id")
+  email                String            @unique
+  username             String?           @unique
+  passwordHash         String?           @map("password_hash")
+  role                 String            @default("Candidate")
+  provider             String            @default("credentials")
+  providerId           String?           @map("provider_id")
   avatar               String?
-  resetPasswordToken   String?        @map("reset_password_token")
-  resetPasswordExpires String?        @map("reset_password_expires")
+  resetPasswordToken   String?           @map("reset_password_token")
+  resetPasswordExpires String?           @map("reset_password_expires")
   refreshTokens        RefreshToken[]
+  ownedWorkspaces      Workspace[]       @relation("OwnedWorkspaces")
+  workspaceMemberships WorkspaceMember[]
+  friendships          Friendship[]      @relation("UserFriendships")
+  friendsOf            Friendship[]      @relation("UserFriends")
+  notifications        Notification[]
 
   @@map("users")
 }
@@ -35,3 +41,80 @@ model RefreshToken {
 
   @@map("refresh_tokens")
 }
+
+model Workspace {
+  id              Int               @id @default(autoincrement())
+  name            String
+  ownerId         Int               @map("owner_id")
+  owner           User              @relation("OwnedWorkspaces", fields: [ownerId], references: [id], onDelete: Cascade)
+  inviteCode      String            @unique @map("invite_code")
+  problemUrl      String?           @map("problem_url")
+  problemPlatform String?           @map("problem_platform")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  members         WorkspaceMember[]
+  sheets          Sheet[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          Int       @id @default(autoincrement())
+  workspaceId Int       @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      Int       @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        String    @default("Editor") // Owner, Editor, Viewer
+  joinedAt    DateTime  @default(now()) @map("joined_at")
+
+  @@unique([workspaceId, userId])
+  @@map("workspace_members")
+}
+
+model Sheet {
+  id          Int       @id @default(autoincrement())
+  workspaceId Int       @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name        String
+  isPublic    Boolean   @default(true) @map("is_public")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("sheets")
+}
+
+model Friendship {
+  id        Int              @id @default(autoincrement())
+  userId    Int              @map("user_id")
+  user      User             @relation("UserFriendships", fields: [userId], references: [id], onDelete: Cascade)
+  friendId  Int              @map("friend_id")
+  friend    User             @relation("UserFriends", fields: [friendId], references: [id], onDelete: Cascade)
+  status    FriendshipStatus @default(PENDING)
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  @@unique([userId, friendId])
+  @@map("friendships")
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // "WORKSPACE_INVITE", "FRIEND_REQUEST"
+  title     String
+  content   String
+  isRead    Boolean  @default(false) @map("is_read")
+  link      String?  // e.g. /workspace/invite/{code}
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("notifications")
+}
+
+

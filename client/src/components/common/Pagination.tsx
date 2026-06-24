@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 import type { PaginationProps } from '../../types';
+import '../../styles/pagination.css';
 
 export const Pagination: React.FC<PaginationProps> = ({
   currentPage,
@@ -23,14 +24,14 @@ export const Pagination: React.FC<PaginationProps> = ({
     } else {
       pages.push(1);
       if (currentPage > 3) pages.push('...');
-      
+
       const start = Math.max(2, currentPage - 1);
       const end = Math.min(totalPages - 1, currentPage + 1);
-      
+
       for (let i = start; i <= end; i++) {
         pages.push(i);
       }
-      
+
       if (currentPage < totalPages - 2) pages.push('...');
       pages.push(totalPages);
     }
@@ -48,7 +49,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           })}
         </div>
       )}
-      
+
       <div className="flex items-center gap-1">
         <button
           onClick={() => onPageChange(currentPage - 1)}
@@ -63,13 +64,12 @@ export const Pagination: React.FC<PaginationProps> = ({
             key={idx}
             onClick={() => typeof page === 'number' && onPageChange(page)}
             disabled={page === '...'}
-            className={`pagination-page ${
-              page === currentPage
+            className={`pagination-page ${page === currentPage
                 ? 'pagination-page-active'
                 : page === '...'
-                ? 'pagination-ellipsis'
-                : 'pagination-page-inactive'
-            }`}
+                  ? 'pagination-ellipsis'
+                  : 'pagination-page-inactive'
+              }`}
           >
             {page}
           </button>

@@ -37,6 +37,25 @@ const saveRefreshToken = async (userId: number, token: string) => {
   });
 };
 
+const generateUniqueUsername = async (name: string): Promise<string> => {
+  const base = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  let username = '';
+  let exists = true;
+  let attempts = 0;
+  while (exists && attempts < 100) {
+    const code = Math.floor(1000 + Math.random() * 9000);
+    username = `${base}#${code}`;
+    const user = await prisma.user.findUnique({
+      where: { username },
+    });
+    if (!user) {
+      exists = false;
+    }
+    attempts++;
+  }
+  return username;
+};
+
 export const signup = async (req: Request, res: Response) => {
   try {
     const { name, email, password, role } = req.body;
@@ -56,11 +75,15 @@ export const signup = async (req: Request, res: Response) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
+    // Generate unique username
+    const username = await generateUniqueUsername(name);
+
     // Create user in DB via Prisma
     const newUser = await prisma.user.create({
       data: {
         name,
         email: email.toLowerCase(),
+        username,
         passwordHash,
         role: role || 'Candidate',
       },
@@ -78,6 +101,7 @@ export const signup = async (req: Request, res: Response) => {
         id: String(newUser.id),
         name: newUser.name,
         email: newUser.email,
+        username: newUser.username,
         role: newUser.role,
       },
     });
@@ -123,6 +147,7 @@ export const login = async (req: Request, res: Response) => {
         id: String(user.id),
         name: user.name,
         email: user.email,
+        username: user.username,
         role: user.role,
       },
     });
@@ -301,6 +326,7 @@ export const getMe = async (req: AuthRequest, res: Response) => {
         id: String(user.id),
         name: user.name,
         email: user.email,
+        username: user.username,
         role: user.role,
       },
     });

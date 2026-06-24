@@ -9,6 +9,7 @@
 
 html {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 html, body {
@@ -16,6 +17,7 @@ html, body {
   padding: 0;
   box-sizing: border-box;
   background-color: #0a0e14;
+  overflow-x: hidden;
 }
 
 *, *::before, *::after {

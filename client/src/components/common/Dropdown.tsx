@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 import type { DropdownProps } from '../../types';
+import '../../styles/dropdown.css';
 
 export const Dropdown: React.FC<DropdownProps> = ({
   options,
@@ -68,11 +69,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   onChange(option.value);
                   setIsOpen(false);
                 }}
-                className={`dropdown-item ${
-                  option.value === value
+                className={`dropdown-item ${option.value === value
                     ? 'dropdown-item-active'
                     : 'dropdown-item-inactive'
-                }`}
+                  }`}
                 role="menuitem"
               >
                 {option.label}
