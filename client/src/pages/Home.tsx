@@ -120,7 +120,7 @@ export const Home: React.FC = () => {
             </Button>
             <Button
               variant="primary"
-              size="sm"
+              size="md"
               onClick={() => navigate('/login')}
             >
               {t('common.start_session')}

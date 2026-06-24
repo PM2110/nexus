@@ -1,18 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
-
-export interface DropdownOption {
-  value: string;
-  label: string;
-}
-
-interface DropdownProps {
-  options: DropdownOption[];
-  value: string;
-  onChange: (value: string) => void;
-  label?: string;
-  placeholder?: string;
-}
+import { DropdownOption, DropdownProps } from '../../types';
 
 export const Dropdown: React.FC<DropdownProps> = ({
   options,

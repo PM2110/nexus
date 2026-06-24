@@ -1,0 +1,22 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                   Int     @id @default(autoincrement())
+  name                 String
+  email                String  @unique
+  passwordHash         String  @map("password_hash")
+  role                 String  @default("Candidate")
+  resetPasswordToken   String? @map("reset_password_token")
+  resetPasswordExpires String? @map("reset_password_expires")
+
+  @@map("users")
+}

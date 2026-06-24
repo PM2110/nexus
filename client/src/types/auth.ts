@@ -1,0 +1,18 @@
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string, remember: boolean) => Promise<{ success: boolean; message: string }>;
+  signup: (name: string, email: string, password: string, role: string) => Promise<{ success: boolean; message: string }>;
+  forgotPassword: (email: string) => Promise<{ success: boolean; message: string; token?: string }>;
+  resetPassword: (email: string, token: string, password: string) => Promise<{ success: boolean; message: string }>;
+  logout: () => void;
+}

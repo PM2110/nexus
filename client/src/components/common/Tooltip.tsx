@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-
-interface TooltipProps {
-  content: React.ReactNode;
-  children: React.ReactNode;
-  position?: 'top' | 'bottom' | 'left' | 'right';
-}
+import type { TooltipProps } from '../../types';
 
 export const Tooltip: React.FC<TooltipProps> = ({
   content,
